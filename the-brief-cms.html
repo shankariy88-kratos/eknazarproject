@@ -703,14 +703,19 @@
     const summaryClean = summaryText.replace(/•\s*/g, '').trim();
     if (!summaryClean) { showError('[E02] Summary खाली है — AI से Summarize करें या खुद लिखें पर क्लिक करें'); return; }
     const tagSel = document.getElementById('storyTag');
-    const tag = tagSel.value==='__new__' ? (document.getElementById('customTagInput').value.trim()||'अन्य') : tagSel.value;
+    const tag = tagSel.value==='__new__' ? (document.getElementById('customTagInput').value.trim()||'') : tagSel.value;
+    if (!tag) { showError('[E09] Tag/Category जरूरी है — ऊपर category चुनें'); return; }
+    const mediaUrlVal = document.getElementById('mediaUrl').value.trim();
+    if (!mediaUrlVal) { showError('[E10] Image या Video URL जरूरी है — Media section में URL डालें'); return; }
+    const deepLinkVal = document.getElementById('deepLink').value.trim();
+    if (!deepLinkVal) { showError('[E11] App Deep Link जरूरी है — bhaskar:// link डालें'); return; }
     stories.push({ id: Date.now(), tag,
       headline: headlineHTML,
       summary: summaryHTML,
       mediaType,
-      mediaUrl:   document.getElementById('mediaUrl').value.trim(),
+      mediaUrl:   mediaUrlVal,
       articleUrl: document.getElementById('articleUrl').value.trim(),
-      deepLink:   document.getElementById('deepLink').value.trim() });
+      deepLink:   deepLinkVal });
     renderLiveBundle(); clearMainForm(); hideError();
     if (jsonVisible) updateJSON();
   }
@@ -1006,7 +1011,7 @@
       } else {
         result = await callSummarize(url, instruction);
       }
-      document.getElementById('modalSummaryText').innerHTML = result;
+      document.getElementById('modalSummaryText').innerHTML = formatSummaryHTML(result);
       document.getElementById('modalSummarySection').style.display = 'block';
       updateModalWC();
     } catch(e) { alert('E05: ' + e.message); }
@@ -1054,10 +1059,18 @@
 
   function updateModalWC() {
     const el = document.getElementById('modalSummaryText');
-    const bullets = el.querySelectorAll('.sum-bullet').length || el.innerText.split('\n').filter(l=>l.trim().startsWith('•')).length;
+    const text = el.innerText || '';
+    const bullets = el.querySelectorAll('.sum-bullet').length || text.split('\n').filter(l=>l.trim().startsWith('\u2022')).length;
+    const charCount = text.trim().length;
     const wc = document.getElementById('modalWC');
-    wc.textContent = bullets + ' bullets';
-    wc.style.color = bullets>=3&&bullets<=7?'var(--success)':bullets>10?'var(--error)':'var(--muted)';
+    let msg = bullets + ' bullet' + (bullets!==1?'s':'');
+    let color = 'var(--muted)';
+    if (bullets >= 3 && bullets <= 7) color = 'var(--success)';
+    if (bullets > 10) { color = 'var(--error)'; msg += ' — max 10 exceeded'; }
+    if (charCount > 350) { color = 'var(--error)'; msg += ' \u26a0 Card overflow on mobile'; }
+    else if (bullets > 7) { color = '#c8860a'; msg += ' \u26a0 May overflow on small screens'; }
+    wc.textContent = msg;
+    wc.style.color = color;
   }
 
   async function modalSummarize() {
@@ -1067,7 +1080,7 @@
     document.getElementById('modalLoading').classList.add('show');
     try {
       const summary = await callSummarize(url);
-      document.getElementById('modalSummaryText').innerHTML = summary;
+      document.getElementById('modalSummaryText').innerHTML = formatSummaryHTML(summary);
       document.getElementById('modalSummarySection').style.display = 'block';
       updateModalWC();
     } catch(e) { alert('E05: ' + e.message); }
@@ -1075,47 +1088,55 @@
   }
 
   function saveModal() {
-    const headline = document.getElementById('modalHeadline').innerHTML.trim();
-    const summary = document.getElementById('modalSummaryText').innerHTML.trim();
-    const tag = document.getElementById('modalTag').value;
-    const deepLink = document.getElementById('modalDeepLink').value.trim();
-    const articleUrl = document.getElementById('modalArticleUrl').value.trim();
-    const mediaUrl = document.getElementById('modalMediaUrl').value.trim();
-    if (!headline) { alert('E01: Headline जरूरी है'); return; }
-    if (!summary) { alert('E02: Summary जरूरी है'); return; }
-
     const ctx = modalCtx;
+    if (!ctx) { alert('E99: Modal context खो गया — फिर से खोलें'); return; }
 
+    const headlineEl = document.getElementById('modalHeadline');
+    const summaryEl = document.getElementById('modalSummaryText');
+
+    // Use innerText for emptiness check (innerHTML can be '<br>' in empty contenteditable)
+    const headlineText = (headlineEl.innerText || '').trim();
+    const summaryText = (summaryEl.innerText || '').replace(/^[•\s]+$/gm, '').trim();
+    const headline = headlineEl.innerHTML.trim();
+    const summary = summaryEl.innerHTML.trim();
+
+    if (!headlineText) { alert('E01: Headline जरूरी है'); headlineEl.focus(); return; }
+    if (!summaryText) { alert('E02: Summary जरूरी है'); summaryEl.focus(); return; }
+
+    const tag = document.getElementById('modalTag').value;
+    if (!tag) { alert('E09: Tag/Category जरूरी है'); return; }
+    const mediaUrl = document.getElementById('modalMediaUrl').value.trim();
+    if (!mediaUrl) { alert('E10: Image या Video URL जरूरी है'); document.getElementById('modalMediaUrl').focus(); return; }
+    const deepLink = document.getElementById('modalDeepLink').value.trim();
+    if (!deepLink) { alert('E11: App Deep Link जरूरी है'); document.getElementById('modalDeepLink').focus(); return; }
+    const articleUrl = document.getElementById('modalArticleUrl').value.trim();
     const storyData = { tag, headline, summary, deepLink, articleUrl, mediaUrl, mediaType: modalMediaType };
 
-    if (ctx.mode==='live-edit') {
-      const s = stories.find(s=>s.id===ctx.storyId);
-      if (s) { Object.assign(s, storyData); }
-      renderLiveBundle(); if(jsonVisible) updateJSON();
+    if (ctx.mode === 'live-edit') {
+      const s = stories.find(s => s.id === ctx.storyId);
+      if (!s) { alert('E99: Story नहीं मिली'); return; }
+      Object.assign(s, storyData);
+      renderLiveBundle(); if (jsonVisible) updateJSON();
       showToast('Story updated');
 
-    } else if (ctx.mode==='live-add') {
-      // Not used from modal — handled by main form
-    } else if (ctx.mode==='history-edit') {
+    } else if (ctx.mode === 'history-edit') {
       const all = loadAllBundles();
-      const b = all.find(b=>b.id===ctx.bundleId);
-      if (b) {
-        b.stories[ctx.storyIdx] = { ...b.stories[ctx.storyIdx], ...storyData };
-        b.savedAt = new Date().toISOString();
-        persistBundles(all); renderHistory();
-        setTimeout(()=>{ const el=document.getElementById('hstories-'+ctx.bundleId); if(el) el.classList.add('open'); },50);
-      }
+      const b = all.find(b => b.id === ctx.bundleId);
+      if (!b) { alert('E99: Bundle नहीं मिली'); return; }
+      b.stories[ctx.storyIdx] = { ...b.stories[ctx.storyIdx], ...storyData };
+      b.savedAt = new Date().toISOString();
+      persistBundles(all); renderHistory();
+      setTimeout(() => { const el = document.getElementById('hstories-' + ctx.bundleId); if (el) el.classList.add('open'); }, 50);
       showToast('Story updated');
 
-    } else if (ctx.mode==='history-add') {
+    } else if (ctx.mode === 'history-add') {
       const all = loadAllBundles();
-      const b = all.find(b=>b.id===ctx.bundleId);
-      if (b) {
-        b.stories.push(storyData);
-        b.savedAt = new Date().toISOString();
-        persistBundles(all); renderHistory();
-        setTimeout(()=>{ const el=document.getElementById('hstories-'+ctx.bundleId); if(el) el.classList.add('open'); },50);
-      }
+      const b = all.find(b => b.id === ctx.bundleId);
+      if (!b) { alert('E99: Bundle नहीं मिली'); return; }
+      b.stories.push(storyData);
+      b.savedAt = new Date().toISOString();
+      persistBundles(all); renderHistory();
+      setTimeout(() => { const el = document.getElementById('hstories-' + ctx.bundleId); if (el) el.classList.add('open'); }, 50);
       showToast('Story added to bundle');
     }
 
