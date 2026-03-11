@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f12; --surface: #161a20; --surface2: #1e242d;
-    --border: #2a3040; --accent: #e8b84b; --accent2: #f0d080;
-    --text: #e8eaf0; --muted: #7a8299; --success: #4caf82; --error: #e05c5c;
+    --bg: #f5f2ec; --surface: #ffffff; --surface2: #f0ece4;
+    --border: #ddd5c8; --accent: #c8860a; --accent2: #e8a020;
+    --text: #1a1208; --muted: #6b5e4a; --success: #2e8f5a; --error: #c94040;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -37,7 +37,7 @@
   label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,184,75,0.1); }
-  select option { background: #1e242d; }
+  select option { background: #f0ece4; }
   textarea { resize: vertical; line-height: 1.5; }
   .url-row { display: flex; gap: 10px; align-items: flex-end; }
   .url-row input { flex: 1; }
@@ -103,7 +103,7 @@
   .json-section { padding: 10px 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
   .json-toggle { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-family: 'DM Sans', sans-serif; padding: 7px 13px; border-radius: 6px; cursor: pointer; width: 100%; text-align: left; display: flex; justify-content: space-between; transition: border-color 0.2s; }
   .json-toggle:hover { border-color: var(--accent); color: var(--text); }
-  .json-output { background: #0a0d10; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: #8ec07c; overflow-x: auto; white-space: pre; margin-top: 8px; max-height: 200px; overflow-y: auto; line-height: 1.5; }
+  .json-output { background: #f8f4ee; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: #2a5a2a; overflow-x: auto; white-space: pre; margin-top: 8px; max-height: 200px; overflow-y: auto; line-height: 1.5; }
   .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: 'DM Sans', sans-serif; padding: 5px 11px; border-radius: 5px; cursor: pointer; margin-top: 7px; transition: all 0.2s; }
   .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
   .copy-btn.copied { border-color: var(--success); color: var(--success); }
@@ -148,7 +148,7 @@
   .empty-history .icon { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
 
   /* ── Modal ── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,18,8,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 600px; max-width: 95vw; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative; transform: translateY(12px); transition: transform 0.2s; }
   .modal-overlay.open .modal { transform: translateY(0); }
@@ -172,6 +172,31 @@
   .modal-loading { display: none; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; margin-top: 8px; }
   .modal-loading.show { display: flex; }
   .modal-wc { font-size: 11px; color: var(--muted); text-align: right; margin-top: 5px; }
+
+  /* ── Headline editor ── */
+  .headline-editor-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+  .headline-editor-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,134,10,0.1); }
+  .color-toolbar { display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .ct-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-right: 2px; }
+  .ct-color { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+  .ct-color:hover { transform: scale(1.2); border-color: var(--border); }
+  .ct-reset { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; font-family: 'DM Sans',sans-serif; padding: 3px 9px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .ct-reset:hover { border-color: var(--error); color: var(--error); }
+  .headline-editable { padding: 10px 13px; min-height: 74px; font-family: 'DM Sans',sans-serif; font-size: 15px; color: var(--text); line-height: 1.5; outline: none; }
+  .headline-editable:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
+
+  /* ── Summary editable ── */
+  .summary-editable { min-height: 80px; outline: none; font-size: 14px; color: var(--text); line-height: 1.8; padding: 4px 0; }
+  .summary-editable:empty::before { content: 'Summary यहाँ दिखेगी...'; color: var(--muted); pointer-events: none; }
+  .summary-editable strong { font-weight: 700; color: var(--text); }
+  .sum-bullet { padding: 2px 0; }
+
+  /* ── Regen buttons ── */
+  .regen-btns { display: flex; align-items: center; gap: 7px; margin-top: 10px; flex-wrap: wrap; }
+  .regen-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .regen-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'DM Sans',sans-serif; padding: 5px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .regen-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,134,10,0.06); }
+  .regen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* Toast */
   .save-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--success); color: #0d0f12; font-size: 13px; font-weight: 600; padding: 11px 22px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 999; }
@@ -256,7 +281,21 @@
 
       <div class="form-group full">
         <label>Headline (हिंदी)</label>
-        <textarea id="storyHeadline" rows="3" placeholder="खबर की हेडलाइन यहाँ लिखें..." style="min-height:74px;"></textarea>
+        <div class="headline-editor-wrap">
+          <div class="color-toolbar" id="colorToolbar">
+            <span class="ct-label">रंग:</span>
+            <button class="ct-color" style="background:#000000;" onclick="applyHeadlineColor('#000000')" title="Black"></button>
+            <button class="ct-color" style="background:#cc0000;" onclick="applyHeadlineColor('#cc0000')" title="Red"></button>
+            <button class="ct-color" style="background:#1a6b3a;" onclick="applyHeadlineColor('#1a6b3a')" title="Dark Green"></button>
+            <button class="ct-color" style="background:#1a6bc4;" onclick="applyHeadlineColor('#1a6bc4')" title="Blue"></button>
+            <button class="ct-color" style="background:#6b21a8;" onclick="applyHeadlineColor('#6b21a8')" title="Purple"></button>
+            <button class="ct-color" style="background:#22c55e;" onclick="applyHeadlineColor('#22c55e')" title="Light Green"></button>
+            <button class="ct-color" style="background:#ea6a00;" onclick="applyHeadlineColor('#ea6a00')" title="Orange"></button>
+            <button class="ct-color" style="background:#1e3a6e;" onclick="applyHeadlineColor('#1e3a6e')" title="Navy Blue"></button>
+            <button class="ct-reset" onclick="applyHeadlineColor('')" title="Reset color">✕ Reset</button>
+          </div>
+          <div id="storyHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..."></div>
+        </div>
       </div>
 
       <div class="form-group full">
@@ -286,9 +325,17 @@
       <div class="divider"></div>
       <label>AI Summary (हिंदी) — Edit if needed</label>
       <div class="summary-block">
-        <div class="summary-label">Claude द्वारा जनरेटेड</div>
-        <textarea id="summaryText" rows="4" oninput="updateWordCount()"></textarea>
-        <div class="word-count" id="wordCount">0 words</div>
+        <div class="summary-label">✦ Claude द्वारा जनरेटेड</div>
+        <div id="summaryText" contenteditable="true" class="summary-editable" oninput="updateWordCount()"></div>
+        <div class="word-count" id="wordCount">0 bullets</div>
+      </div>
+      <div class="regen-btns">
+        <span class="regen-label">फिर से बनाएं:</span>
+        <button class="regen-btn" onclick="regenSummary(3)">3 bullets</button>
+        <button class="regen-btn" onclick="regenSummary(5)">5 bullets</button>
+        <button class="regen-btn" onclick="regenSummary(7)">7 bullets</button>
+        <button class="regen-btn" onclick="regenAction('shorter')">↑ Shorter</button>
+        <button class="regen-btn" onclick="regenAction('elaborate')">↓ Elaborate</button>
       </div>
     </div>
 
@@ -462,8 +509,9 @@
     document.getElementById('summarizeBtn').disabled = true;
     try {
       const summary = await callSummarize(url);
-      document.getElementById('summaryText').value = summary;
+      document.getElementById('summaryText').innerHTML = formatSummaryHTML(summary);
       document.getElementById('summaryArea').style.display = 'block';
+      updateWordCount();
       updateWordCount();
     } catch(err) { showError('Error: ' + err.message); }
     finally { document.getElementById('loadingArea').style.display='none'; document.getElementById('summarizeBtn').disabled=false; }
@@ -477,7 +525,7 @@
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 1000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Please fetch and read the article at this URL: ${url}\n\nWrite a Hindi news summary as bullet points. Requirements:\n- Write in clean, simple Hindi (not Hinglish)\n- Use 3 to 7 bullet points depending on how much important context the story has\n- Each bullet should be one clear fact or development\n- Cover: what happened, who is involved, key numbers/details, and the impact or implication\n- No opinions, no editorializing\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else` }]
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Please fetch and read the article at this URL: ${url}\n\nWrite a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 7 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else` }]
       })
     });
     const data = await response.json();
@@ -488,16 +536,16 @@
   }
 
   function updateWordCount() {
-    const text = document.getElementById('summaryText').value;
-    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-    const el = document.getElementById('wordCount');
-    el.textContent = `${words} words`;
-    el.style.color = words>=60&&words<=80 ? 'var(--success)' : words>80 ? 'var(--error)' : 'var(--muted)';
+    const el = document.getElementById('summaryText');
+    const bullets = el.innerText.split('\n').filter(l=>l.trim().startsWith('•')).length;
+    const wc = document.getElementById('wordCount');
+    wc.textContent = `${bullets} bullet${bullets!==1?'s':''}`;
+    wc.style.color = bullets>=3&&bullets<=7 ? 'var(--success)' : bullets>7 ? 'var(--error)' : 'var(--muted)';
   }
 
   // ── Live bundle: add story ──
   function addStory() {
-    const headline = document.getElementById('storyHeadline').value.trim();
+    const headline = document.getElementById('storyHeadline').innerHTML.trim();
     const summary = document.getElementById('summaryText').value.trim();
     if (!headline) { showError('Headline जरूरी है'); return; }
     if (!summary) { showError('Summary जरूरी है — पहले Summarize करें'); return; }
@@ -512,7 +560,7 @@
   }
 
   function clearMainForm() {
-    ['storyHeadline','mediaUrl','articleUrl','deepLink','summaryText'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('storyHeadline').innerHTML=''; document.getElementById('summaryText').innerHTML=''; ['mediaUrl','articleUrl','deepLink'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('summaryArea').style.display='none';
   }
 
@@ -835,6 +883,126 @@
 
   // Keyboard: Esc closes modal
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') { closeModal(); document.getElementById('keyPanel').style.display='none'; } });
+
+  // ── Format summary: convert **bold** to <strong> and • to bullet lines ──
+  function formatSummaryHTML(text) {
+    return text.split('\n')
+      .map(line => {
+        line = line.trim();
+        if (!line) return '';
+        // Bold: **text** → <strong>text</strong>
+        line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        if (line.startsWith('•')) {
+          return '<div class="sum-bullet">' + line + '</div>';
+        }
+        return '<div>' + line + '</div>';
+      })
+      .filter(Boolean)
+      .join('');
+  }
+
+  // ── Headline color picker ──
+  function applyHeadlineColor(color) {
+    const el = document.getElementById('storyHeadline');
+    el.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+      // No selection — apply to all
+      if (color) {
+        el.style.color = color;
+      } else {
+        el.style.color = '';
+        // Also remove spans
+        el.querySelectorAll('span[style*="color"]').forEach(s => {
+          s.replaceWith(document.createTextNode(s.textContent));
+        });
+      }
+      return;
+    }
+    if (color) {
+      document.execCommand('foreColor', false, color);
+    } else {
+      document.execCommand('removeFormat', false, null);
+    }
+  }
+
+  // ── Regen summary ──
+  async function regenSummary(bulletCount) {
+    const url = document.getElementById('articleUrl').value.trim();
+    if (!url) { showError('Article URL डालें'); return; }
+    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
+    if (!apiKey) { toggleKeyPanel(); return; }
+
+    document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=true);
+    document.getElementById('loadingArea').style.display='block';
+    hideError();
+
+    try {
+      const summary = await callSummarizeWithCount(url, bulletCount);
+      document.getElementById('summaryText').innerHTML = formatSummaryHTML(summary);
+      document.getElementById('summaryArea').style.display = 'block';
+      updateWordCount();
+    } catch(e) {
+      showError(e.message);
+    } finally {
+      document.getElementById('loadingArea').style.display='none';
+      document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=false);
+    }
+  }
+
+  async function regenAction(action) {
+    const current = document.getElementById('summaryText').innerText.trim();
+    if (!current) { showError('पहले summary generate करें'); return; }
+    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
+    if (!apiKey) { toggleKeyPanel(); return; }
+
+    document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=true);
+    document.getElementById('loadingArea').style.display='block';
+    hideError();
+
+    const instruction = action === 'shorter'
+      ? 'Make this summary shorter. Keep only the most essential bullets. Remove less important ones. Keep the same simple Hindi style.'
+      : 'Make this summary more detailed and elaborative. Add more context and important details. Keep the same simple Hindi style. Max 7 bullets.';
+
+    try {
+      const apiKey = localStorage.getItem('ek_nazar_api_key');
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 600,
+          messages: [{ role: 'user', content: `${instruction}\n\nCurrent summary:\n${current}\n\nRules:\n- Each bullet max 15 words\n- Start each bullet with •\n- Bold key facts using **bold**\n- Only output bullet points, nothing else` }]
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+      document.getElementById('summaryText').innerHTML = formatSummaryHTML(text);
+      updateWordCount();
+    } catch(e) {
+      showError(e.message);
+    } finally {
+      document.getElementById('loadingArea').style.display='none';
+      document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=false);
+    }
+  }
+
+  async function callSummarizeWithCount(url, count) {
+    const apiKey = localStorage.getItem('ek_nazar_api_key');
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 800,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Read the article at: ${url}\n\nWrite exactly ${count} bullet points in Hindi.\n- Write like talking to a friend — simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    if (!text) throw new Error('Summary नहीं मिली');
+    return text;
+  }
 
   // ── API Key management ──
   function toggleKeyPanel() {
