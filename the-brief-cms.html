@@ -1243,18 +1243,23 @@
 
   // ── Format summary: convert **bold** to <strong> and • to bullet lines ──
   function formatSummaryHTML(text) {
-    return text.split('\n')
-      .map(line => {
-        line = line.trim();
-        if (!line) return '';
-        // Bold: **text** → <strong>text</strong>
-        line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        if (line.startsWith('•')) {
-          return '<div class="sum-bullet">' + line + '</div>';
-        }
-        return ''; // strip non-bullet lines like preamble text
-      })
+    if (!text || !text.trim()) return '';
+    // Find first bullet marker — everything before it is preamble, skip it
+    const firstBullet = text.indexOf('\u2022');
+    if (firstBullet === -1) {
+      // No bullet markers — wrap entire non-empty text as one bullet
+      const line = text.trim().replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      return line ? '<div class="sum-bullet">\u2022 ' + line + '</div>' : '';
+    }
+    // Take only the bullet section; split on '•' to get individual bullets
+    const bulletSection = text.substring(firstBullet);
+    return bulletSection.split('\u2022')
+      .map(part => part.trim())
       .filter(Boolean)
+      .map(part => {
+        const bold = part.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        return '<div class="sum-bullet">\u2022 ' + bold + '</div>';
+      })
       .join('');
   }
 
