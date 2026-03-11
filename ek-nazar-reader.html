@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>एक नज़र</title>
-<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -22,35 +22,33 @@
   /* ── Top bar ── */
   .topbar {
     background: #fff;
-    padding: 14px 18px 12px;
+    padding: 12px 16px 10px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #e8e0d4;
     flex-shrink: 0;
-    position: relative;
   }
 
   .back-btn {
-    width: 34px; height: 34px;
+    width: 32px; height: 32px;
     background: #f5f0e8;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    text-decoration: none; color: #1a1208; font-size: 16px;
+    text-decoration: none; color: #1a1208; font-size: 15px;
     border: 1px solid #e0d4c0;
     flex-shrink: 0;
-    margin-top: 2px;
   }
 
-  .topbar-center { flex: 1; padding: 0 14px; }
+  .topbar-center { flex: 1; padding: 0 12px; }
 
   .topbar-title {
     font-family: 'Noto Sans Devanagari', sans-serif;
-    font-size: 19px;
+    font-size: 17px;
+    font-weight: 600;
     color: #1a1208;
     line-height: 1.2;
   }
-
   .topbar-title span { color: #d4500a; }
 
   .topbar-sub {
@@ -60,13 +58,12 @@
   }
 
   .card-counter {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #7a6a52;
-    padding-top: 4px;
     flex-shrink: 0;
+    white-space: nowrap;
   }
-
   .card-counter strong { color: #1a1208; }
 
   /* ── Slot tabs ── */
@@ -77,28 +74,36 @@
     flex-shrink: 0;
   }
 
+  .slot-tabs {
+    padding: 6px 12px;
+    gap: 6px;
+  }
   .slot-tab {
-    flex: 1; padding: 10px 6px;
-    font-size: 12px; font-weight: 600;
+    flex: 1; padding: 6px 4px;
+    font-size: 13px; font-weight: 600;
     color: #7a6a52; cursor: pointer;
     border: none; background: none;
     font-family: 'Noto Sans Devanagari', sans-serif;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    border-radius: 20px;
+    transition: all 0.2s;
     text-align: center;
-    position: relative;
   }
-
-  .slot-tab.active { color: #d4500a; border-bottom-color: #d4500a; }
-
-  .slot-dot {
+  .slot-tab.active {
+    color: #d4500a;
+    background: rgba(212,80,10,0.1);
+  }
+  .slot-tab { position: relative; }
+  .slot-tab .fresh-dot {
     display: none;
-    position: absolute; top: 7px; right: 18%;
-    width: 5px; height: 5px;
-    background: #d4500a; border-radius: 50%;
+    position: absolute;
+    top: 5px; right: 12px;
+    width: 7px; height: 7px;
+    background: #d4500a;
+    border-radius: 50%;
+    border: 1.5px solid #fff;
   }
-
-  .slot-tab.has-content .slot-dot { display: block; }
+  .slot-tab.has-fresh .fresh-dot { display: block; }
+  .slot-tab.active .fresh-dot { display: none; }
 
   /* ── Progress bar ── */
   .progress-wrap {
@@ -106,15 +111,13 @@
     background: #e8e0d4;
     flex-shrink: 0;
   }
-
   .progress-bar {
     height: 100%;
     background: #d4500a;
     transition: width 0.3s ease;
-    border-radius: 0 2px 2px 0;
   }
 
-  /* ── Card container (swipeable) ── */
+  /* ── Card container ── */
   .card-viewport {
     flex: 1;
     overflow: hidden;
@@ -131,52 +134,47 @@
   /* ── Single card ── */
   .news-card {
     min-width: 100%;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     background: #fff;
     overflow: hidden;
+    flex-shrink: 0;
   }
 
   .card-image {
     width: 100%;
-    height: 220px;
-    object-fit: cover;
+    height: 170px;
     background: #e8e0d4;
     display: flex; align-items: center; justify-content: center;
-    font-size: 48px;
     flex-shrink: 0;
+    overflow: hidden;
     position: relative;
   }
-
-  .card-image img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
-
-  .card-image-placeholder { font-size: 40px; opacity: 0.3; }
+  .card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-image-placeholder { font-size: 36px; opacity: 0.25; }
 
   .card-body {
     flex: 1;
-    padding: 18px 18px 0;
+    padding: 12px 16px 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .card-tags {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-
   .card-tag {
+    position: absolute;
+    bottom: 10px; left: 12px;
     font-size: 11px;
-    font-weight: 600;
-    color: #d4500a;
-    letter-spacing: 0.03em;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.04em;
+    background: rgba(212,80,10,0.88);
+    padding: 3px 9px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    z-index: 2;
   }
-
-  .card-tag-sep { color: #c8b8a0; font-size: 11px; }
 
   .card-headline {
     font-family: 'Noto Sans Devanagari', sans-serif;
@@ -184,23 +182,20 @@
     font-weight: 600;
     line-height: 1.45;
     color: #1a1208;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
-
-  .card-headline em { color: #d4500a; font-style: normal; }
 
   .card-divider {
     height: 1px;
     background: #e8e0d4;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
-  /* Summary as bullet points */
   .card-bullets {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding-bottom: 16px;
+    padding-bottom: 14px;
   }
 
   .bullet-item {
@@ -210,15 +205,13 @@
   }
 
   .bullet-num {
-    width: 20px; height: 20px;
-    background: #f5f0e8;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700;
     color: #d4500a;
+    font-size: 16px;
+    line-height: 1.6;
     flex-shrink: 0;
-    margin-top: 1px;
-    border: 1px solid #e8d8c0;
+    margin-top: 0;
+    width: 14px;
+    text-align: center;
   }
 
   .bullet-text {
@@ -227,11 +220,12 @@
     line-height: 1.6;
     color: #3a2e20;
   }
+  .bullet-text strong { font-weight: 700; color: #1a1208; }
 
-  /* ── Bottom CTA ── */
+  /* ── CTA footer ── */
   .card-footer {
     background: #fff;
-    padding: 12px 18px;
+    padding: 8px 16px 10px;
     border-top: 1px solid #e8e0d4;
     flex-shrink: 0;
   }
@@ -239,83 +233,74 @@
   .read-more-btn {
     display: block;
     width: 100%;
-    padding: 14px;
-    background: rgba(212,80,10,0.08);
+    padding: 10px;
+    background: rgba(212,80,10,0.07);
     border: 1px solid rgba(212,80,10,0.2);
     border-radius: 8px;
     color: #d4500a;
     font-family: 'Noto Sans Devanagari', sans-serif;
-    font-size: 17px;
+    font-size: 15px;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s;
   }
+  .read-more-btn:active { background: rgba(212,80,10,0.14); }
 
-  .read-more-btn:active { background: rgba(212,80,10,0.15); }
-
-  /* ── Nav arrows ── */
-  .nav-arrows {
-    position: absolute;
-    bottom: 80px;
-    right: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 10;
-  }
-
-  .nav-arrow {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid #e0d4c0;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.2s;
-  }
-
-  .nav-arrow:hover { background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.15); }
-  .nav-arrow:disabled { opacity: 0.3; cursor: default; }
-
-  /* ── Empty / loading ── */
+  /* ── Empty / loading states ── */
   .state-screen {
     min-width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
-    text-align: center;
-    background: #fff;
-    gap: 12px;
+    min-height: 300px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px; text-align: center;
+    background: #fff; gap: 14px;
   }
-
-  .state-icon { font-size: 48px; opacity: 0.3; }
-  .state-title { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 22px; color: #1a1208; }
+  .state-icon { font-size: 44px; opacity: 0.25; }
+  .state-title { font-size: 20px; color: #1a1208; font-weight: 600; }
   .state-sub { font-size: 13px; color: #7a6a52; line-height: 1.6; }
-
-  .anim-bar {
-    width: 60px; height: 3px; background: #e8e0d4; border-radius: 2px; overflow: hidden; margin-top: 8px;
-  }
-  .anim-fill {
-    height: 100%; width: 30%; background: #d4500a; border-radius: 2px;
-    animation: fill 1.8s ease-in-out infinite alternate;
-  }
+  .anim-bar { width: 60px; height: 3px; background: #e8e0d4; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+  .anim-fill { height: 100%; background: #d4500a; border-radius: 2px; animation: fill 1.8s ease-in-out infinite alternate; }
   @keyframes fill { from { width: 10%; } to { width: 90%; } }
 
   /* Skeleton */
-  .skel-card {
-    min-width: 100%; height: 100%;
-    background: #fff; display: flex; flex-direction: column;
+  .skel-card { min-width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; }
+  .skel-img { width: 100%; height: 200px; background: #ede8e0; flex-shrink: 0; animation: shimmer 1.5s infinite; }
+  .skel-body { padding: 16px; flex: 1; }
+  .skel-line { height: 13px; border-radius: 4px; background: #ede8e0; margin-bottom: 10px; animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+  /* ── Desktop-only nav buttons (hidden on touch/mobile) ── */
+  .desktop-nav {
+    display: none;
   }
-  .skel-img { width: 100%; height: 220px; background: #ede8e0; flex-shrink: 0; animation: shimmer 1.5s infinite; }
-  .skel-body { padding: 18px; flex: 1; }
-  .skel-line { height: 14px; border-radius: 4px; background: #ede8e0; margin-bottom: 10px; animation: shimmer 1.5s infinite; }
-  @keyframes shimmer {
-    0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
+  @media (hover: hover) and (pointer: fine) {
+    .desktop-nav {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
+      padding: 0 8px;
+      z-index: 10;
+    }
+    .desktop-nav-btn {
+      pointer-events: all;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #e0d4c0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: all 0.2s;
+      color: #1a1208;
+    }
+    .desktop-nav-btn:hover { background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.18); }
+    .desktop-nav-btn:disabled { opacity: 0.25; cursor: default; }
   }
 
   /* Update toast */
@@ -323,15 +308,14 @@
     position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
     background: #1a1208; color: #fff;
     font-size: 12px; font-weight: 600;
-    padding: 9px 18px; border-radius: 20px;
-    display: flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 20px;
     opacity: 0; pointer-events: none; transition: opacity 0.3s;
     z-index: 100; white-space: nowrap;
+    display: flex; align-items: center; gap: 7px;
   }
   .update-toast.show { opacity: 1; }
   .toast-dot { width: 6px; height: 6px; background: #d4500a; border-radius: 50%; }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -339,7 +323,7 @@
 <div class="topbar">
   <a class="back-btn" href="ek-nazar-landing.html">←</a>
   <div class="topbar-center">
-    <div class="topbar-title" id="topbarTitle">सुबह की <span>एक नज़र</span></div>
+    <div class="topbar-title" id="topbarTitle">दोपहर की <span>एक नज़र</span></div>
     <div class="topbar-sub" id="topbarSub"></div>
   </div>
   <div class="card-counter"><strong id="curNum">—</strong> / <span id="totNum">—</span></div>
@@ -347,15 +331,9 @@
 
 <!-- Slot tabs -->
 <div class="slot-tabs">
-  <button class="slot-tab active" data-slot="सुबह" onclick="switchSlot('सुबह')">
-    🌅 सुबह<div class="slot-dot"></div>
-  </button>
-  <button class="slot-tab" data-slot="दोपहर" onclick="switchSlot('दोपहर')">
-    ☀️ दोपहर<div class="slot-dot"></div>
-  </button>
-  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')">
-    🌆 शाम<div class="slot-dot"></div>
-  </button>
+  <button class="slot-tab" data-slot="सुबह" onclick="switchSlot('सुबह')">🌅 सुबह<span class="fresh-dot"></span></button>
+  <button class="slot-tab active" data-slot="दोपहर" onclick="switchSlot('दोपहर')">☀️ दोपहर<span class="fresh-dot"></span></button>
+  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')">🌆 शाम<span class="fresh-dot"></span></button>
 </div>
 
 <!-- Progress -->
@@ -366,28 +344,26 @@
 <!-- Card viewport -->
 <div class="card-viewport" id="cardViewport">
   <div class="card-track" id="cardTrack">
-    <!-- skeleton -->
     <div class="skel-card">
       <div class="skel-img"></div>
       <div class="skel-body">
-        <div class="skel-line" style="width:40%;height:12px;margin-bottom:14px"></div>
-        <div class="skel-line" style="width:100%;height:22px;margin-bottom:8px"></div>
-        <div class="skel-line" style="width:80%;height:22px;margin-bottom:20px"></div>
+        <div class="skel-line" style="width:35%;height:11px;margin-bottom:12px"></div>
+        <div class="skel-line" style="width:100%;height:20px;margin-bottom:6px"></div>
+        <div class="skel-line" style="width:75%;height:20px;margin-bottom:18px"></div>
         <div class="skel-line" style="width:100%"></div>
-        <div class="skel-line" style="width:95%"></div>
-        <div class="skel-line" style="width:70%"></div>
+        <div class="skel-line" style="width:90%"></div>
+        <div class="skel-line" style="width:65%"></div>
       </div>
     </div>
   </div>
-
-  <!-- nav arrows -->
-  <div class="nav-arrows">
-    <button class="nav-arrow" id="prevBtn" onclick="goTo(currentIdx-1)" disabled>↑</button>
-    <button class="nav-arrow" id="nextBtn" onclick="goTo(currentIdx+1)">↓</button>
+  <!-- Desktop nav — hidden on mobile via CSS -->
+  <div class="desktop-nav">
+    <button class="desktop-nav-btn" id="prevBtn" onclick="goTo(currentIdx-1)" disabled>←</button>
+    <button class="desktop-nav-btn" id="nextBtn" onclick="goTo(currentIdx+1)">→</button>
   </div>
 </div>
 
-<!-- Footer CTA — rendered per card -->
+<!-- Footer CTA -->
 <div class="card-footer" id="cardFooter" style="display:none">
   <a class="read-more-btn" id="readMoreBtn" href="#" target="_blank">पूरी खबर पढ़ें →</a>
 </div>
@@ -397,17 +373,12 @@
 
 <script>
   const STORAGE_KEY = 'ek_nazar_bundles';
-  let currentSlot = 'सुबह';
+  let currentSlot = 'दोपहर';
   let currentIdx = 0;
   let cards = [];
 
-  // Date display
   const now = new Date();
-  document.getElementById('topbarSub').textContent = now.toLocaleDateString('hi-IN', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-  }) + ' • ' + currentSlot + ' ' + now.toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' });
-
-  function getToday() { return new Date().toISOString().split('T')[0]; }
+  function getToday() { return now.toISOString().split('T')[0]; }
 
   function loadBundles() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
@@ -418,37 +389,67 @@
     return all.sort((a,b) => new Date(b.savedAt) - new Date(a.savedAt))[0];
   }
 
+  // Track which slots user has visited this session
+  const VISITED_KEY = 'ek_nazar_visited_' + new Date().toISOString().split('T')[0];
+  function getVisited() { try { return JSON.parse(sessionStorage.getItem(VISITED_KEY) || '[]'); } catch { return []; } }
+  function markVisited(slot) {
+    const v = getVisited();
+    if (!v.includes(slot)) { v.push(slot); sessionStorage.setItem(VISITED_KEY, JSON.stringify(v)); }
+  }
+
   function updateSlotDots() {
-    const todaySlots = loadBundles().filter(b => b.date === getToday()).map(b => b.slot);
+    const todayBundles = loadBundles().filter(b => b.date === getToday()).map(b => b.slot);
+    const visited = getVisited();
     document.querySelectorAll('.slot-tab').forEach(t => {
-      t.classList.toggle('has-content', todaySlots.includes(t.dataset.slot));
+      const hasContent = todayBundles.includes(t.dataset.slot);
+      const seen = visited.includes(t.dataset.slot);
+      t.classList.toggle('has-fresh', hasContent && !seen);
     });
   }
 
   function switchSlot(slot) {
+    markVisited(slot);
     currentSlot = slot;
     currentIdx = 0;
-    document.querySelectorAll('.slot-tab').forEach(t => t.classList.toggle('active', t.dataset.slot === slot));
+    document.querySelectorAll('.slot-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.slot === slot));
     const titles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
     document.getElementById('topbarTitle').innerHTML = `${titles[slot]} <span>एक नज़र</span>`;
+    updateSlotDots();
     renderCards();
   }
 
-  function summaryToBullets(summary) {
-    // Split on common sentence endings or — dashes for bullets
-    const raw = summary.trim();
-    // Try splitting on। or . or — 
-    let parts = raw.split(/[।\.]+/).map(s=>s.trim()).filter(s=>s.length > 10);
-    if (parts.length < 2) parts = raw.split(/[,،—–-]/).map(s=>s.trim()).filter(s=>s.length > 15);
-    if (parts.length < 2) {
-      // fallback: chunk into ~40 word segments
-      const words = raw.split(' ');
-      parts = [];
-      for (let i=0; i<words.length; i+=Math.ceil(words.length/3)) {
-        parts.push(words.slice(i, i+Math.ceil(words.length/3)).join(' '));
+  // ── Parse bullets from CMS HTML ──
+  function parseBullets(summaryHTML) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = summaryHTML || '';
+    const results = [];
+
+    // Walk child nodes — each div.sum-bullet is one bullet
+    tmp.querySelectorAll('div').forEach(node => {
+      const text = (node.innerText || node.textContent || '').trim();
+      if (text.startsWith('•')) {
+        // Get innerHTML but strip leading bullet char
+        let html = node.innerHTML.replace(/^•\s*/, '').trim();
+        if (html) results.push(html);
       }
+    });
+
+    // Fallback: split innerText by newline
+    if (!results.length) {
+      (tmp.innerText || tmp.textContent || '').split('\n').forEach(line => {
+        const clean = line.replace(/^•\s*/, '').trim();
+        if (clean.length > 3) results.push(clean);
+      });
     }
-    return parts.slice(0, 4);
+
+    // Last fallback: whole text as one bullet
+    if (!results.length) {
+      const t = (tmp.innerText || tmp.textContent || '').trim();
+      if (t) results.push(t);
+    }
+
+    return results;
   }
 
   function renderCards() {
@@ -458,12 +459,13 @@
     const footer = document.getElementById('cardFooter');
 
     if (!bundle || !bundle.stories || !bundle.stories.length) {
-      const todayAny = loadBundles().filter(b=>b.date===getToday()).length > 0;
+      const slotTimes = { 'सुबह': 'सुबह 7:00 बजे', 'दोपहर': 'दोपहर 2:00 बजे', 'शाम': 'शाम 7:00 बजे' };
+      const slotNames = { 'सुबह': 'सुबह की एक नज़र', 'दोपहर': 'दोपहर की एक नज़र', 'शाम': 'शाम की एक नज़र' };
       track.innerHTML = `
         <div class="state-screen">
           <div class="state-icon">📰</div>
-          <div class="state-title">${currentSlot} की खबरें</div>
-          <div class="state-sub">${todayAny ? 'इस slot की bundle अभी तैयार नहीं हुई।<br>थोड़ी देर में आएगी।' : 'Editorial team bundle बना रही है।<br>जल्द आ रहा है।'}</div>
+          <div class="state-title">${slotNames[currentSlot]}</div>
+          <div class="state-sub">${slotTimes[currentSlot]} तक आएगी</div>
           <div class="anim-bar"><div class="anim-fill"></div></div>
         </div>`;
       footer.style.display = 'none';
@@ -475,35 +477,35 @@
     cards = bundle.stories;
     footer.style.display = 'block';
 
-    track.innerHTML = cards.map((s, i) => {
-      const bullets = summaryToBullets(s.summary);
-      const mediaHtml = s.mediaUrl
-        ? `<div class="card-image"><img src="${s.mediaUrl}" alt="" onerror="this.parentElement.innerHTML='<div class=card-image-placeholder>📰</div>'"></div>`
-        : `<div class="card-image"><div class="card-image-placeholder">📰</div></div>`;
+    track.innerHTML = cards.map((s) => {
+      const bullets = parseBullets(s.summary);
+      const tag = s.tag || '';
+      const imgUrl = s.mediaUrl || '';
+      const isVideo = s.mediaType === 'video';
+      let mediaCont = '';
+      if (imgUrl && isVideo) {
+        mediaCont = '<video src="' + imgUrl + '" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>';
+      } else if (imgUrl) {
+        mediaCont = '<img src="' + imgUrl + '" alt="" onerror="this.parentElement.innerHTML=\'<div class=card-image-placeholder>📰</div>\'">';
+      } else {
+        mediaCont = '<div class="card-image-placeholder">📰</div>';
+      }
+      const imgHtml = '<div class="card-image"><span class="card-tag">' + tag + '</span>' + mediaCont + '</div>';
 
-      const bulletHtml = bullets.map((b,bi) => `
-        <div class="bullet-item">
-          <div class="bullet-num">${bi+1}</div>
-          <div class="bullet-text">${b}</div>
-        </div>`).join('');
+      const bulletHtml = bullets.map((b, bi) =>
+        '<div class="bullet-item"><div class="bullet-num">•</div><div class="bullet-text">' + b + '</div></div>'
+      ).join('');
 
-      return `
-        <div class="news-card">
-          ${mediaHtml}
-          <div class="card-body">
-            <div class="card-tags">
-              <span class="card-tag">${s.tag}</span>
-              <span class="card-tag-sep">·</span>
-              <span class="card-tag">भास्कर</span>
-            </div>
-            <div class="card-headline">${s.headline}</div>
-            <div class="card-divider"></div>
-            <div class="card-bullets">${bulletHtml}</div>
-          </div>
-        </div>`;
+      return '<div class="news-card">'
+        + imgHtml
+        + '<div class="card-body">'
+        + '<div class="card-headline">' + (s.headline || '') + '</div>'
+        + '<div class="card-divider"></div>'
+        + '<div class="card-bullets">' + (bulletHtml || '<div class="bullet-text">—</div>') + '</div>'
+        + '</div></div>';
     }).join('');
 
-    goTo(currentIdx, false);
+    goTo(0, false);
   }
 
   function goTo(idx, animate = true) {
@@ -523,11 +525,12 @@
     if (s) {
       const btn = document.getElementById('readMoreBtn');
       btn.href = s.deepLink || s.articleUrl || '#';
-      btn.style.pointerEvents = (s.deepLink || s.articleUrl) ? 'auto' : 'none';
+      btn.style.opacity = (s.deepLink || s.articleUrl) ? '1' : '0.4';
     }
-
-    document.getElementById('prevBtn').disabled = idx === 0;
-    document.getElementById('nextBtn').disabled = idx === cards.length - 1;
+    const pb = document.getElementById('prevBtn');
+    const nb = document.getElementById('nextBtn');
+    if (pb) pb.disabled = idx === 0;
+    if (nb) nb.disabled = idx === cards.length - 1;
   }
 
   function updateCounter(cur, tot) {
@@ -536,40 +539,59 @@
   }
 
   function updateProgress(cur, tot) {
-    const pct = tot > 0 ? (cur / tot) * 100 : 0;
-    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressBar').style.width = tot > 0 ? (cur/tot*100)+'%' : '0%';
   }
 
-  // Swipe support
-  let touchStartX = 0, touchStartY = 0;
+  // Swipe — touch + mouse
+  let txStart = 0, tyStart = 0, dragging = false;
   const vp = document.getElementById('cardViewport');
 
-  vp.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
+  // Touch
+  vp.addEventListener('touchstart', e => { txStart = e.touches[0].clientX; tyStart = e.touches[0].clientY; }, { passive: true });
   vp.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      if (dx < 0) goTo(currentIdx + 1);
-      else goTo(currentIdx - 1);
-    }
+    const dx = e.changedTouches[0].clientX - txStart;
+    const dy = e.changedTouches[0].clientY - tyStart;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) goTo(dx < 0 ? currentIdx + 1 : currentIdx - 1);
   }, { passive: true });
 
-  // Init
-  setTimeout(() => renderCards(), 400);
+  // Mouse drag
+  vp.addEventListener('mousedown', e => { txStart = e.clientX; tyStart = e.clientY; dragging = true; e.preventDefault(); });
+  window.addEventListener('mousemove', e => { if (!dragging) return; e.preventDefault(); });
+  window.addEventListener('mouseup', e => {
+    if (!dragging) return;
+    dragging = false;
+    const dx = e.clientX - txStart;
+    const dy = e.clientY - tyStart;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) goTo(dx < 0 ? currentIdx + 1 : currentIdx - 1);
+  });
 
-  // Live update
+  // Keyboard arrows
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(currentIdx + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(currentIdx - 1);
+  });
+
+  // Live update from CMS
   window.addEventListener('storage', e => {
     if (e.key === STORAGE_KEY) {
-      const oldCount = cards.length;
       renderCards();
       const t = document.getElementById('updateToast');
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);
     }
+  });
+
+  // Init — run after all functions defined
+  document.addEventListener('DOMContentLoaded', function() {
+    // Date in topbar
+    document.getElementById('topbarSub').textContent = now.toLocaleDateString('hi-IN', { day: 'numeric', month: 'long' });
+    // Auto-detect slot by time
+    const hr = now.getHours();
+    let initSlot = 'दोपहर';
+    if (hr < 12) initSlot = 'सुबह';
+    else if (hr < 17) initSlot = 'दोपहर';
+    else initSlot = 'शाम';
+    switchSlot(initSlot);
   });
 </script>
 </body>
