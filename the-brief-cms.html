@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ek Nazar — Editorial CMS</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f5f2ec; --surface: #ffffff; --surface2: #f0ece4;
@@ -12,15 +12,15 @@
     --text: #1a1208; --muted: #6b5e4a; --success: #2e8f5a; --error: #c94040;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'Noto Sans Devanagari', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* ── Header ── */
   header { border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: stretch; justify-content: space-between; background: var(--surface); height: 60px; }
   .header-left { display: flex; align-items: center; gap: 32px; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--accent); white-space: nowrap; }
-  .logo span { color: var(--muted); font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 10px; }
+  .logo { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 20px; color: var(--accent); white-space: nowrap; }
+  .logo span { color: var(--muted); font-size: 12px; font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 10px; }
   .nav-tabs { display: flex; align-items: stretch; height: 100%; }
-  .nav-tab { display: flex; align-items: center; gap: 7px; padding: 0 20px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border: none; background: none; font-family: 'DM Sans', sans-serif; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
+  .nav-tab { display: flex; align-items: center; gap: 7px; padding: 0 20px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border: none; background: none; font-family: 'Noto Sans Devanagari', sans-serif; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
   .nav-tab:hover { color: var(--text); }
   .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .bundle-count { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); align-self: center; }
@@ -35,7 +35,7 @@
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: 1 / -1; }
   label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; padding: 10px 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,184,75,0.1); }
   select option { background: #f0ece4; }
   textarea { resize: vertical; line-height: 1.5; }
@@ -45,7 +45,7 @@
   .error-msg { background: rgba(224,92,92,0.1); border: 1px solid rgba(224,92,92,0.3); color: var(--error); font-size: 13px; padding: 11px 13px; border-radius: 8px; margin-top: 8px; }
 
   /* ── Buttons ── */
-  .btn { padding: 10px 18px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn { padding: 10px 18px; border-radius: 8px; border: none; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .btn-primary { background: var(--accent); color: #0d0f12; }
   .btn-primary:hover { background: var(--accent2); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -59,7 +59,7 @@
   .panel-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
 
   .media-tabs { display: flex; margin-bottom: 10px; }
-  .media-tab { flex: 1; padding: 9px; font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .media-tab { flex: 1; padding: 9px; font-size: 12px; font-weight: 600; font-family: 'Noto Sans Devanagari', sans-serif; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.2s; }
   .media-tab:first-child { border-radius: 8px 0 0 8px; }
   .media-tab:last-child { border-radius: 0 8px 8px 0; border-left: none; }
   .media-tab.active { background: rgba(232,184,75,0.15); color: var(--accent); border-color: rgba(232,184,75,0.4); }
@@ -92,7 +92,7 @@
   .card-number { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
   .card-tag { font-size: 10px; font-weight: 600; color: var(--muted); background: var(--surface); padding: 2px 8px; border-radius: 3px; }
   .card-actions { display: flex; gap: 4px; }
-  .card-btn { background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 11px; padding: 3px 8px; border-radius: 4px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; font-weight: 600; line-height: 1.4; }
+  .card-btn { background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 11px; padding: 3px 8px; border-radius: 4px; transition: all 0.15s; font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 600; line-height: 1.4; }
   .card-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,184,75,0.07); }
   .card-btn:disabled { opacity: 0.2; cursor: default; border-color: var(--border); color: var(--muted); background: none; }
   .card-btn.del:hover { border-color: var(--error); color: var(--error); background: rgba(224,92,92,0.08); }
@@ -101,16 +101,16 @@
 
   .bundle-footer { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
   .json-section { padding: 10px 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
-  .json-toggle { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-family: 'DM Sans', sans-serif; padding: 7px 13px; border-radius: 6px; cursor: pointer; width: 100%; text-align: left; display: flex; justify-content: space-between; transition: border-color 0.2s; }
+  .json-toggle { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-family: 'Noto Sans Devanagari', sans-serif; padding: 7px 13px; border-radius: 6px; cursor: pointer; width: 100%; text-align: left; display: flex; justify-content: space-between; transition: border-color 0.2s; }
   .json-toggle:hover { border-color: var(--accent); color: var(--text); }
   .json-output { background: #f8f4ee; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: #2a5a2a; overflow-x: auto; white-space: pre; margin-top: 8px; max-height: 200px; overflow-y: auto; line-height: 1.5; }
-  .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: 'DM Sans', sans-serif; padding: 5px 11px; border-radius: 5px; cursor: pointer; margin-top: 7px; transition: all 0.2s; }
+  .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: 'Noto Sans Devanagari', sans-serif; padding: 5px 11px; border-radius: 5px; cursor: pointer; margin-top: 7px; transition: all 0.2s; }
   .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
   .copy-btn.copied { border-color: var(--success); color: var(--success); }
 
   /* ── History view ── */
   .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
-  .history-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
+  .history-header h2 { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 22px; color: var(--text); }
   .history-header h2 span { color: var(--accent); }
   .history-stats { display: flex; gap: 10px; }
   .stat-pill { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 5px 13px; border-radius: 20px; }
@@ -131,7 +131,7 @@
   .hb-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
   .hb-sub { font-size: 11px; color: var(--muted); }
   .hb-header-actions { display: flex; gap: 8px; align-items: center; }
-  .hb-btn { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all 0.2s; }
+  .hb-btn { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 600; transition: all 0.2s; }
   .hb-btn:hover { border-color: var(--accent); color: var(--accent); }
   .hb-btn.copied { border-color: var(--success); color: var(--success); }
   .hb-btn.danger:hover { border-color: var(--error); color: var(--error); background: rgba(224,92,92,0.08); }
@@ -141,7 +141,7 @@
   .hb-story-cards { display: flex; flex-direction: column; gap: 8px; }
 
   .hb-add-row { margin-top: 10px; }
-  .hb-add-btn { background: none; border: 1px dashed var(--border); color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; transition: all 0.2s; }
+  .hb-add-btn { background: none; border: 1px dashed var(--border); color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'Noto Sans Devanagari', sans-serif; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; transition: all 0.2s; }
   .hb-add-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,184,75,0.04); }
 
   .empty-history { text-align: center; padding: 80px 32px; color: var(--muted); font-size: 14px; }
@@ -153,7 +153,7 @@
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 600px; max-width: 95vw; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative; transform: translateY(12px); transition: transform 0.2s; }
   .modal-overlay.open .modal { transform: translateY(0); }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-  .modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); }
+  .modal-title { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 18px; color: var(--text); }
   .modal-title span { color: var(--accent); }
   .modal-close { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 16px; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
   .modal-close:hover { border-color: var(--error); color: var(--error); }
@@ -180,13 +180,13 @@
   .ct-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-right: 2px; }
   .ct-color { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
   .ct-color:hover { transform: scale(1.2); border-color: var(--border); }
-  .ct-reset { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; font-family: 'DM Sans',sans-serif; padding: 3px 9px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .ct-reset { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; font-family: 'Noto Sans Devanagari',sans-serif; padding: 3px 9px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
   .ct-reset:hover { border-color: var(--error); color: var(--error); }
-  .headline-editable { padding: 10px 13px; min-height: 74px; font-family: 'DM Sans',sans-serif; font-size: 15px; color: var(--text); line-height: 1.5; outline: none; }
+  .headline-editable { padding: 10px 13px; min-height: 74px; font-family: 'Noto Sans Devanagari',sans-serif; font-size: 15px; color: var(--text); line-height: 1.5; outline: none; }
   .headline-editable:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
 
   /* ── Summary editable ── */
-  .summary-editable { min-height: 80px; outline: none; font-size: 14px; color: var(--text); line-height: 1.8; padding: 4px 0; }
+  .summary-editable { min-height: 80px; outline: none; font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.8; padding: 4px 0; }
   .summary-editable:empty::before { content: 'Summary यहाँ दिखेगी...'; color: var(--muted); pointer-events: none; }
   .summary-editable strong { font-weight: 700; color: var(--text); }
   .sum-bullet { padding: 2px 0; }
@@ -194,7 +194,7 @@
   /* ── Regen buttons ── */
   .regen-btns { display: flex; align-items: center; gap: 7px; margin-top: 10px; flex-wrap: wrap; }
   .regen-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
-  .regen-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'DM Sans',sans-serif; padding: 5px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .regen-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'Noto Sans Devanagari',sans-serif; padding: 5px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .regen-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,134,10,0.06); }
   .regen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .custom-prompt-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
@@ -308,7 +308,14 @@
       <div class="divider"></div>
       <label>AI Summary (हिंदी) — Edit if needed</label>
       <div class="summary-block">
-        <div class="summary-label">✦ Claude द्वारा जनरेटेड</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div class="summary-label" style="margin-bottom:0;">✦ Claude द्वारा जनरेटेड</div>
+          <div style="display:flex;gap:5px;align-items:center;">
+            <button onclick="document.execCommand('bold')" title="Bold" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:700;font-family:serif;padding:2px 8px;border-radius:4px;cursor:pointer;line-height:1.4;">B</button>
+            <button onclick="document.execCommand('italic')" title="Italic" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;font-style:italic;font-family:serif;padding:2px 8px;border-radius:4px;cursor:pointer;line-height:1.4;">I</button>
+            <button onclick="addBullet()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;padding:3px 10px;border-radius:4px;cursor:pointer;">+ Bullet</button>
+          </div>
+        </div>
         <div id="summaryText" contenteditable="true" class="summary-editable" oninput="updateWordCount()"></div>
         <div class="word-count" id="wordCount">0 bullets</div>
       </div>
@@ -338,7 +345,10 @@
   <div class="bundle-panel">
     <div class="bundle-header">
       <h3>Bundle Preview</h3>
-      <div class="slot-badge" id="slotBadge">सुबह</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="openCardPreview(0)" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;padding:4px 12px;border-radius:5px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">📱 Card Preview</button>
+        <div class="slot-badge" id="slotBadge">सुबह</div>
+      </div>
     </div>
     <div class="story-cards" id="storyCards">
       <div class="empty-state"><div class="empty-icon">📰</div><div>No stories yet.<br>Add the first story to the bundle.</div></div>
@@ -519,7 +529,7 @@
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 1000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Please fetch and read the article at this URL: ${url}\n\nWrite a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 7 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else` }]
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Please fetch and read the article at this URL: ${url}\n\nWrite a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else` }]
       })
     });
     const data = await response.json();
@@ -531,24 +541,39 @@
 
   function updateWordCount() {
     const el = document.getElementById('summaryText');
-    const bullets = el.innerText.split('\n').filter(l=>l.trim().startsWith('•')).length;
+    const text = el.innerText || '';
+    const bullets = text.split('\n').filter(l=>l.trim().startsWith('•')).length;
+    const charCount = text.trim().length;
     const wc = document.getElementById('wordCount');
-    wc.textContent = `${bullets} bullet${bullets!==1?'s':''}`;
-    wc.style.color = bullets>=3&&bullets<=7 ? 'var(--success)' : bullets>7 ? 'var(--error)' : 'var(--muted)';
+    let msg = `${bullets} bullet${bullets!==1?'s':''}`;
+    let color = 'var(--muted)';
+    if (bullets >= 3 && bullets <= 10) color = 'var(--success)';
+    if (bullets > 10) { color = 'var(--error)'; msg += ' — max 10 exceeded'; }
+    if (charCount > 350) { color = 'var(--error)'; msg += ' ⚠ Card overflow on mobile'; }
+    else if (bullets > 7) { color = '#c8860a'; msg += ' ⚠ May overflow on small screens'; }
+    wc.textContent = msg;
+    wc.style.color = color;
   }
 
   // ── Live bundle: add story ──
   function addStory() {
-    const headline = document.getElementById('storyHeadline').innerHTML.trim();
-    const summary = document.getElementById('summaryText').value.trim();
-    if (!headline) { showError('Headline जरूरी है'); return; }
-    if (!summary) { showError('Summary जरूरी है — पहले Summarize करें'); return; }
+    const hEl = document.getElementById('storyHeadline');
+    const sEl = document.getElementById('summaryText');
+    const headlineText = (hEl.innerText || '').trim();
+    const summaryText  = (sEl.innerText  || '').trim();
+    const headlineHTML = (hEl.innerHTML  || '').trim();
+    const summaryHTML  = (sEl.innerHTML  || '').trim();
+    if (!headlineText) { showError('Headline जरूरी है'); return; }
+    if (!summaryText)  { showError('Summary जरूरी है — पहले Summarize करें'); return; }
     const tagSel = document.getElementById('storyTag');
     const tag = tagSel.value==='__new__' ? (document.getElementById('customTagInput').value.trim()||'अन्य') : tagSel.value;
-    stories.push({ id: Date.now(), tag, headline, summary, mediaType,
-      mediaUrl: document.getElementById('mediaUrl').value.trim(),
+    stories.push({ id: Date.now(), tag,
+      headline: headlineHTML,
+      summary: summaryHTML,
+      mediaType,
+      mediaUrl:   document.getElementById('mediaUrl').value.trim(),
       articleUrl: document.getElementById('articleUrl').value.trim(),
-      deepLink: document.getElementById('deepLink').value.trim() });
+      deepLink:   document.getElementById('deepLink').value.trim() });
     renderLiveBundle(); clearMainForm(); hideError();
     if (jsonVisible) updateJSON();
   }
@@ -899,7 +924,7 @@
         headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514', max_tokens: 600,
-          messages: [{ role: 'user', content: `You are editing a Hindi news summary. Current summary:\n${current}\n\nInstruction: ${instruction}\n\nRules:\n- Keep simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
+          messages: [{ role: 'user', content: `You are editing a Hindi news summary. Current summary:\n${current}\n\nInstruction: ${instruction}\n\nRules:\n- Keep simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
         })
       });
       const data = await response.json();
@@ -914,6 +939,25 @@
       document.getElementById('loadingArea').style.display='none';
       document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=false);
     }
+  }
+
+  // ── Add blank bullet to summary ──
+  function addBullet() {
+    const el = document.getElementById('summaryText');
+    document.getElementById('summaryArea').style.display = 'block';
+    const newBullet = document.createElement('div');
+    newBullet.className = 'sum-bullet';
+    newBullet.textContent = '• ';
+    el.appendChild(newBullet);
+    // Place cursor at end of new bullet
+    el.focus();
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.setStart(newBullet, newBullet.childNodes.length);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    updateWordCount();
   }
 
   // ── Format summary: convert **bold** to <strong> and • to bullet lines ──
@@ -1003,7 +1047,7 @@
         headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514', max_tokens: 600,
-          messages: [{ role: 'user', content: `${instruction}\n\nCurrent summary:\n${current}\n\nRules:\n- Each bullet max 15 words\n- Start each bullet with •\n- Bold key facts using **bold**\n- Only output bullet points, nothing else` }]
+          messages: [{ role: 'user', content: `${instruction}\n\nCurrent summary:\n${current}\n\nRules:\n- Each bullet max 15 words\n- Start each bullet with •\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Only output bullet points, nothing else` }]
         })
       });
       const data = await response.json();
@@ -1026,7 +1070,7 @@
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 800,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Read the article at: ${url}\n\nWrite exactly ${count} bullet points in Hindi.\n- Write like talking to a friend — simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Read the article at: ${url}\n\nWrite exactly ${count} bullet points in Hindi.\n- Write like talking to a friend — simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
       })
     });
     const data = await response.json();
@@ -1035,6 +1079,117 @@
     if (!text) throw new Error('Summary नहीं मिली');
     return text;
   }
+
+  // ── Card Preview ──
+  let cpIdx = 0;
+
+  function openCardPreview(idx) {
+    if (!stories.length) { showError('Bundle में कोई story नहीं है'); return; }
+    cpIdx = idx || 0;
+    document.getElementById('cardPreviewOverlay').style.display = 'flex';
+    renderCardPreview();
+  }
+
+  function closeCardPreview() {
+    document.getElementById('cardPreviewOverlay').style.display = 'none';
+  }
+  // Close on overlay click — using delegation so modal doesn't need to exist yet
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'cardPreviewOverlay') closeCardPreview();
+  });
+
+  function cardPreviewNav(dir) {
+    cpIdx = Math.max(0, Math.min(cpIdx + dir, stories.length - 1));
+    renderCardPreview();
+  }
+
+  function cpParseBullets(summaryHTML) {
+    // Parse • prefixed lines from contenteditable HTML
+    const tmp = document.createElement('div');
+    tmp.innerHTML = summaryHTML;
+    // Walk child nodes to preserve bold/italic inline HTML per bullet
+    const results = [];
+    tmp.childNodes.forEach(node => {
+      const text = node.textContent || '';
+      if (text.trim().startsWith('•')) {
+        // Get inner HTML of this node but strip leading bullet char
+        const html = (node.innerHTML || node.textContent || '').replace(/^•\s*/, '');
+        if (html.trim()) results.push(html.trim());
+      }
+    });
+    // Fallback: split innerText by newline
+    if (!results.length) {
+      tmp.innerText && tmp.innerText.split('\n').forEach(line => {
+        const clean = line.replace(/^•\s*/, '').trim();
+        if (clean) results.push(clean);
+      });
+    }
+    return results;
+  }
+
+  function renderCardPreview() {
+    const s = stories[cpIdx];
+    if (!s) return;
+    const total = stories.length;
+    const slot = (document.getElementById('slotBadge').textContent || 'दोपहर').trim();
+
+    // Topbar — slot label + date
+    const slotTitles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
+    const slotTitle = slotTitles[slot] || slot + ' की';
+    document.getElementById('cpTopbarTitle').innerHTML = `${slotTitle} <span style="color:#d4500a;">एक नज़र</span>`;
+    const now = new Date();
+    document.getElementById('cpTopbarSub').textContent = now.toLocaleDateString('hi-IN', { weekday:'long', day:'numeric', month:'long' });
+
+    // Slot tabs — highlight active
+    const slotMap = { 'सुबह': 0, 'दोपहर': 1, 'शाम': 2 };
+    const activeIdx = slotMap[slot] ?? 1;
+    [0,1,2].forEach(i => {
+      const tab = document.getElementById('cpTab' + i);
+      if (!tab) return;
+      tab.style.color = i === activeIdx ? '#d4500a' : '#7a6a52';
+      tab.style.borderBottom = i === activeIdx ? '2px solid #d4500a' : '2px solid transparent';
+    });
+
+    // Counter & progress
+    document.getElementById('cpCounter').textContent = `${cpIdx+1} / ${total}`;
+    document.getElementById('cpProgress').style.width = `${((cpIdx+1)/total)*100}%`;
+
+    // Image
+    const imgEl = document.getElementById('cpImage');
+    if (s.mediaUrl) {
+      imgEl.style.opacity = '1';
+      imgEl.innerHTML = `<img src="${s.mediaUrl}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📰';this.parentElement.style.opacity='0.4'">`;
+    } else {
+      imgEl.style.opacity = '0.4';
+      imgEl.innerHTML = '📰';
+    }
+
+    // Tag + headline
+    document.getElementById('cpTag').textContent = s.tag;
+    document.getElementById('cpHeadline').innerHTML = s.headline;
+
+    // Bullets — properly parsed, bold preserved
+    const bullets = cpParseBullets(s.summary);
+    const bulletsHTML = bullets.map((b, i) => `
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="min-width:20px;height:20px;background:#f5f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#d4500a;border:1px solid #e8d8c0;flex-shrink:0;margin-top:1px;">${i+1}</div>
+        <div style="font-family:'Noto Sans Devanagari',sans-serif;font-size:14px;font-weight:400;line-height:1.6;color:#3a2e20;">${b}</div>
+      </div>`).join('');
+    document.getElementById('cpBullets').innerHTML = bulletsHTML || '<div style="color:#aaa;font-size:13px;">कोई summary नहीं</div>';
+
+    // Dots
+    document.getElementById('cpDots').innerHTML = Array.from({length: total}, (_,i) =>
+      `<div style="width:${i===cpIdx?16:6}px;height:6px;border-radius:3px;background:${i===cpIdx?'#d4500a':'#c8b8a0'};transition:all 0.2s;"></div>`
+    ).join('');
+
+    // Prev/Next button opacity
+    const prevBtn = document.getElementById('cpPrevBtn');
+    const nextBtn = document.getElementById('cpNextBtn');
+    if (prevBtn) prevBtn.style.opacity = cpIdx === 0 ? '0.3' : '1';
+    if (nextBtn) nextBtn.style.opacity = cpIdx === total-1 ? '0.3' : '1';
+  }
+
+
 
   // ── API Key management ──
   function toggleKeyPanel() {
@@ -1054,8 +1209,6 @@
     localStorage.setItem('ek_nazar_api_key', key);
     document.getElementById('keyPanel').style.display = 'none';
     updateKeyStatus();
-  populateTagSelect('storyTag');
-  populateTagSelect('storyTag');
   }
 
   function updateKeyStatus() {
@@ -1082,5 +1235,78 @@
   updateKeyStatus();
   populateTagSelect('storyTag');
 </script>
+<!-- ══ Card Preview Modal ══ -->
+<div id="cardPreviewOverlay" style="display:none;position:fixed;inset:0;background:rgba(26,18,8,0.7);z-index:300;align-items:center;justify-content:center;padding:16px;">
+  <div style="position:relative;width:100%;max-width:375px;margin:0 auto;">
+
+    <!-- Label -->
+    <div style="text-align:center;margin-bottom:10px;font-size:12px;font-weight:600;color:#f5f0e8;letter-spacing:0.05em;opacity:0.7;">CARD PREVIEW — 375×812px (iPhone SE)</div>
+
+    <!-- Close -->
+    <button onclick="closeCardPreview()" style="position:absolute;top:-4px;right:0;background:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;z-index:10;line-height:28px;text-align:center;">✕</button>
+
+    <!-- Phone frame: 375px wide, clips at 812px height -->
+    <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:8px solid #1a1208;height:700px;display:flex;flex-direction:column;">
+
+      <!-- Topbar — exact reader match -->
+      <div style="background:#fff;padding:12px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e8e0d4;flex-shrink:0;">
+        <div style="width:30px;height:30px;background:#f5f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid #e0d4c0;flex-shrink:0;">←</div>
+        <div style="flex:1;padding:0 12px;">
+          <div id="cpTopbarTitle" style="font-family:'Noto Sans Devanagari',sans-serif;font-size:17px;color:#1a1208;line-height:1.2;">दोपहर की <span style="color:#d4500a;">एक नज़र</span></div>
+          <div id="cpTopbarSub" style="font-size:11px;color:#7a6a52;margin-top:2px;"></div>
+        </div>
+        <div id="cpCounter" style="font-size:12px;font-weight:600;color:#7a6a52;white-space:nowrap;padding-top:2px;"></div>
+      </div>
+
+      <!-- Progress bar -->
+      <div style="height:3px;background:#e8e0d4;flex-shrink:0;"><div id="cpProgress" style="height:100%;background:#d4500a;transition:width 0.3s;"></div></div>
+
+      <!-- Slot tabs -->
+      <div style="display:flex;background:#fff;border-bottom:1px solid #e8e0d4;flex-shrink:0;">
+        <div id="cpTab0" style="flex:1;padding:8px 0;text-align:center;font-size:12px;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;color:#7a6a52;border-bottom:2px solid transparent;">🌅 सुबह</div>
+        <div id="cpTab1" style="flex:1;padding:8px 0;text-align:center;font-size:12px;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;color:#d4500a;border-bottom:2px solid #d4500a;">☀️ दोपहर</div>
+        <div id="cpTab2" style="flex:1;padding:8px 0;text-align:center;font-size:12px;font-weight:600;font-family:'Noto Sans Devanagari',sans-serif;color:#7a6a52;border-bottom:2px solid transparent;">🌆 शाम</div>
+      </div>
+
+      <!-- Card — scrollable body -->
+      <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;background:#fff;">
+
+        <!-- Image -->
+        <div id="cpImage" style="width:100%;height:200px;background:#e8e0d4;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:0.4;overflow:hidden;">📰</div>
+
+        <!-- Body scroll area -->
+        <div style="flex:1;overflow-y:auto;padding:16px 16px 0;-webkit-overflow-scrolling:touch;">
+          <!-- Tags -->
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+            <span id="cpTag" style="font-size:11px;font-weight:600;color:#d4500a;letter-spacing:0.03em;font-family:'Noto Sans Devanagari',sans-serif;"></span>
+            <span style="color:#c8b8a0;font-size:11px;">·</span>
+            <span style="font-size:11px;font-weight:600;color:#d4500a;font-family:'Noto Sans Devanagari',sans-serif;">भास्कर</span>
+          </div>
+          <!-- Headline 16px semibold -->
+          <div id="cpHeadline" style="font-family:'Noto Sans Devanagari',sans-serif;font-size:16px;font-weight:600;line-height:1.45;color:#1a1208;margin-bottom:12px;"></div>
+          <!-- Divider -->
+          <div style="height:1px;background:#e8e0d4;margin-bottom:12px;"></div>
+          <!-- Bullets 14px regular -->
+          <div id="cpBullets" style="display:flex;flex-direction:column;gap:10px;padding-bottom:12px;"></div>
+        </div>
+
+        <!-- CTA footer -->
+        <div style="padding:10px 16px;border-top:1px solid #e8e0d4;flex-shrink:0;background:#fff;">
+          <div style="width:100%;padding:12px;background:rgba(212,80,10,0.08);border:1px solid rgba(212,80,10,0.2);border-radius:8px;color:#d4500a;font-family:'Noto Sans Devanagari',sans-serif;font-size:16px;text-align:center;">पूरी खबर पढ़ें →</div>
+        </div>
+      </div>
+
+      <!-- Nav dots -->
+      <div id="cpDots" style="background:#f5f0e8;padding:8px;display:flex;justify-content:center;gap:6px;flex-shrink:0;"></div>
+    </div>
+
+    <!-- Prev / Next -->
+    <div style="display:flex;justify-content:space-between;margin-top:12px;gap:12px;">
+      <button onclick="cardPreviewNav(-1)" id="cpPrevBtn" style="flex:1;background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif;">← पिछला</button>
+      <button onclick="cardPreviewNav(1)"  id="cpNextBtn" style="flex:1;background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif;">अगला →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
