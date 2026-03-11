@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>एक नज़र — Dainik Bhaskar</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #faf6ef;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .db-logo {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 28px;
+    color: #1a1208;
+    margin-bottom: 40px;
+    letter-spacing: 0.01em;
+  }
+
+  .title {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: #1a1208;
+    margin-bottom: 12px;
+  }
+
+  .title span { color: #d4500a; }
+
+  .subtitle {
+    font-size: 14px;
+    color: #7a6a52;
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  .cta {
+    display: block;
+    background: #d4500a;
+    color: #fff;
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 20px;
+    padding: 18px 40px;
+    border-radius: 6px;
+    text-decoration: none;
+    width: 100%;
+    max-width: 320px;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 20px rgba(212,80,10,0.3);
+  }
+
+  .cta:active { transform: scale(0.97); }
+
+  .hint {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #7a6a52;
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #d4500a; border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1.8s infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="db-logo">दैनिक भास्कर</div>
+
+<div class="title">एक <span>नज़र</span></div>
+
+<a class="cta" href="ek-nazar-reader.html">एक नज़र पढ़ें →</a>
+
+<script>
+  function updateHint() {
+    try {
+      const all = JSON.parse(localStorage.getItem('ek_nazar_bundles') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = all.filter(b => b.date === today).reduce((a,b) => a+b.stories.length, 0);
+      document.getElementById('hintText').textContent = todayCount
+        ? `आज की ${todayCount} खबरें तैयार हैं`
+        : 'जल्द आ रहा है';
+    } catch(e) {}
+  }
+  updateHint();
+  window.addEventListener('storage', e => { if(e.key==='ek_nazar_bundles') updateHint(); });
+</script>
+
+</body>
+</html>
