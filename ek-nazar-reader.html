@@ -95,33 +95,35 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 @keyframes skelShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ── Completion Card ── */
-.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow-y: auto; flex-shrink: 0; }
-.comp-top { padding: 28px 20px 20px; text-align: center; flex-shrink: 0; }
-.comp-badge { width: 60px; height: 60px; border-radius: 50%; background: rgba(212,80,10,0.1); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
-.comp-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; line-height: 1.3; }
-.comp-sub { font-size: 13px; color: #999; line-height: 1.5; }
-.comp-divider { height: 1px; background: #f0f0f0; margin: 0 20px; }
-.comp-habit { padding: 18px 20px; flex-shrink: 0; }
-.comp-habit-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #999; margin-bottom: 14px; }
-.habit-grid { display: flex; flex-direction: column; gap: 10px; }
-.habit-row { display: flex; align-items: center; gap: 10px; }
-.habit-slot-label { font-size: 11px; font-weight: 600; color: #999; width: 54px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; }
-.habit-dots { display: flex; gap: 6px; flex: 1; }
-.habit-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #ccc; flex-shrink: 0; background: #fafafa; }
-.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; }
+.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #f5f5f5; overflow-y: auto; flex-shrink: 0; }
+.comp-top { padding: 32px 24px 24px; text-align: center; flex-shrink: 0; background: #fff; }
+.comp-badge { width: 68px; height: 68px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.comp-badge svg { width: 32px; height: 32px; }
+.comp-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; line-height: 1.4; padding: 0 8px; }
+.comp-sub { font-size: 14px; color: #d4500a; line-height: 1.5; font-weight: 500; }
+.comp-divider { height: 8px; background: #f5f5f5; }
+.comp-habit { padding: 20px; flex-shrink: 0; background: #fff; }
+.comp-habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.comp-habit-title { font-size: 14px; font-weight: 700; color: #1a1a1a; margin: 0; letter-spacing: 0; text-transform: none; }
+.comp-habit-hint { font-size: 11px; color: #999; }
+.habit-grid { display: flex; flex-direction: column; gap: 14px; }
+.habit-row { display: flex; align-items: center; gap: 12px; }
+.habit-slot-label { font-size: 12px; font-weight: 600; color: #666; width: 64px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; display: flex; align-items: center; gap: 4px; }
+.habit-dots { display: flex; gap: 6px; flex: 1; justify-content: flex-end; }
+.habit-dot { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #bbb; flex-shrink: 0; background: #fafafa; }
+.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 13px; }
 .habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
-.comp-next { padding: 14px 20px; flex-shrink: 0; }
-.comp-next-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #999; margin-bottom: 12px; }
-.next-slot-row { display: flex; gap: 10px; }
-.next-slot-pill { flex: 1; padding: 12px 8px; border: 1.5px solid #e8e8e8; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa; }
-.next-slot-pill.available { border-color: rgba(212,80,10,0.3); background: rgba(212,80,10,0.04); }
-.next-slot-pill .nsp-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
-.next-slot-pill .nsp-name { font-size: 12px; font-weight: 600; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
-.next-slot-pill .nsp-status { font-size: 9px; color: #999; margin-top: 3px; display: block; }
-.next-slot-pill.available .nsp-status { color: #d4500a; }
-.comp-share { padding: 14px 20px 24px; flex-shrink: 0; }
-.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border: 1.5px solid #e8e8e8; border-radius: 12px; background: none; color: #666; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.share-btn:active { border-color: #d4500a; color: #d4500a; background: rgba(212,80,10,0.04); }
+.habit-dot.missed { border-color: #d4500a; color: #d4500a; background: #fff; }
+.comp-timing { padding: 20px; flex-shrink: 0; background: #fff; }
+.comp-timing-title { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
+.timing-row { display: flex; gap: 10px; }
+.timing-pill { flex: 1; padding: 14px 8px 12px; border: 1.5px solid #e8e8e8; border-radius: 12px; text-align: center; background: #fafafa; }
+.timing-pill .tp-emoji { font-size: 20px; display: block; margin-bottom: 6px; }
+.timing-pill .tp-name { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
+.timing-pill .tp-time { font-size: 11px; color: #999; margin-top: 3px; display: block; }
+.comp-share { padding: 16px 20px 28px; flex-shrink: 0; background: #fff; }
+.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 2px solid #d4500a; border-radius: 12px; background: none; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.share-btn:active { background: rgba(212,80,10,0.06); }
 
 /* ── Toast ── */
 .update-toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 18px; border-radius: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
@@ -325,57 +327,77 @@ function buildCompletionCard() {
   var publishedSlots = all.map(function(b) { return b.slot; });
   var allSlots = ['सुबह', 'दोपहर', 'शाम'];
   var slotEmojis = { 'सुबह': '🌅', 'दोपहर': '☀️', 'शाम': '🌆' };
-  var slotTimes = { 'सुबह': '7:00 AM', 'दोपहर': '2:00 PM', 'शाम': '7:00 PM' };
+  var slotTimes = { 'सुबह': '7:00 AM पर', 'दोपहर': '2:00 PM पर', 'शाम': '7:00 PM पर' };
+  var nextSlotTimes = { 'सुबह': '7:00AM', 'दोपहर': '2:00PM', 'शाम': '7:00PM' };
 
+  // Figure out next slot time for subtitle
+  var nextSlotText = '';
+  var slotOrder = ['सुबह', 'दोपहर', 'शाम'];
+  var curIdx = slotOrder.indexOf(currentSlot);
+  if (curIdx < 2) {
+    nextSlotText = 'अगले अपडेट के लिए ' + nextSlotTimes[slotOrder[curIdx + 1]] + ' पर लौटें';
+  } else {
+    nextSlotText = 'कल सुबह ' + nextSlotTimes['सुबह'] + ' पर मिलते हैं!';
+  }
+
+  // Reading streak — English day labels (M, T, W, T, F, S, S)
   var habitHtml = '';
-  var dayLabels = ['सो', 'म', 'म', 'ब', 'ग', 'शु', 'श'];
+  var engDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  // Get day of week for 6 days ago to figure out labels
   for (var si = 0; si < allSlots.length; si++) {
     var slot = allSlots[si];
     var dotsHtml = '';
-    for (var d = 6; d >= 0; d--) {
+    for (var d = 5; d >= 0; d--) {
       var dt = new Date(now.getTime() - d * 86400000);
       var dtStr = dt.toISOString().split('T')[0];
+      var dayOfWeek = dt.getDay(); // 0=Sun
+      var dayLabel = engDays[dayOfWeek === 0 ? 6 : dayOfWeek - 1]; // Mon-based
       var bundles = loadBundles().filter(function(b) { return b.date === dtStr && b.slot === slot; });
       var isToday = (dtStr === today);
       var isDone = bundles.length > 0 && (d > 0 || publishedSlots.indexOf(slot) !== -1);
       var isCurrent = isToday && slot === currentSlot;
-      var dotClass = 'habit-dot' + (isCurrent ? ' done' : isDone ? ' done' : isToday ? ' today' : '');
-      var dotContent = (isCurrent || isDone) ? '✓' : (isToday ? '·' : dayLabels[6 - d]);
-      dotsHtml += '<div class="' + dotClass + '">' + dotContent + '</div>';
+
+      if (isCurrent || isDone) {
+        dotsHtml += '<div class="habit-dot done">✓</div>';
+      } else if (isToday) {
+        // Today but not done for this slot — show dash in orange outline
+        dotsHtml += '<div class="habit-dot missed">-</div>';
+      } else {
+        dotsHtml += '<div class="habit-dot">' + dayLabel + '</div>';
+      }
     }
     habitHtml += '<div class="habit-row"><div class="habit-slot-label">' + slotEmojis[slot] + ' ' + slot + '</div><div class="habit-dots">' + dotsHtml + '</div></div>';
   }
 
-  var nextHtml = '';
-  for (var ni = 0; ni < allSlots.length; ni++) {
-    var ns = allSlots[ni];
-    var isPublished = publishedSlots.indexOf(ns) !== -1;
-    var isCurrentSlot = (ns === currentSlot);
-    var pillClass = 'next-slot-pill' + (isCurrentSlot ? '' : isPublished ? ' available' : '');
-    var statusText = isCurrentSlot ? 'अभी पढ़ रहे हैं' : isPublished ? 'उपलब्ध है →' : slotTimes[ns] + ' पर';
-    var onclick = (!isCurrentSlot && isPublished) ? ' onclick="switchSlot(this.dataset.slot)" data-slot="' + ns + '"' : '';
-    nextHtml += '<div class="' + pillClass + '"' + onclick + '><span class="nsp-emoji">' + slotEmojis[ns] + '</span><span class="nsp-name">' + ns + '</span><span class="nsp-status">' + statusText + '</span></div>';
+  // Timings section
+  var timingHtml = '';
+  for (var ti = 0; ti < allSlots.length; ti++) {
+    var ts = allSlots[ti];
+    timingHtml += '<div class="timing-pill"><span class="tp-emoji">' + slotEmojis[ts] + '</span><span class="tp-name">' + ts + '</span><span class="tp-time">' + slotTimes[ts] + '</span></div>';
   }
 
-  var slotTitles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
+  // Green checkmark SVG
+  var checkSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12.5L11.5 15L15.5 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
   return '<div class="completion-card">' +
     '<div class="comp-top">' +
-      '<div class="comp-badge">✓</div>' +
-      '<div class="comp-title">' + slotTitles[currentSlot] + ' सभी खबरें पढ़ लीं!</div>' +
-      '<div class="comp-sub">आज की ' + currentSlot + ' की एक नज़र पूरी हो गई।<br>आप अपडेट हैं।</div>' +
+      '<div class="comp-badge">' + checkSvg + '</div>' +
+      '<div class="comp-title">आप देश-दुनिया और लोकल की सभी बड़ी खबरों से पूरी तरह अपडेट हैं</div>' +
+      '<div class="comp-sub">' + nextSlotText + '</div>' +
     '</div>' +
     '<div class="comp-divider"></div>' +
     '<div class="comp-habit">' +
-      '<div class="comp-habit-title">आपकी reading streak</div>' +
+      '<div class="comp-habit-header"><div class="comp-habit-title">आपके इस हफ्ते की रीडिंग स्ट्रीक</div><div class="comp-habit-hint">👆 पढ़ने के लिए क्लिक करें</div></div>' +
       '<div class="habit-grid">' + habitHtml + '</div>' +
     '</div>' +
     '<div class="comp-divider"></div>' +
-    '<div class="comp-next">' +
-      '<div class="comp-next-title">दूसरी खबरें</div>' +
-      '<div class="next-slot-row">' + nextHtml + '</div>' +
+    '<div class="comp-timing">' +
+      '<div class="comp-timing-title">एक नज़र की टाइमिंग्स</div>' +
+      '<div class="timing-row">' + timingHtml + '</div>' +
     '</div>' +
+    '<div class="comp-divider"></div>' +
     '<div class="comp-share">' +
-      '<button class="share-btn" onclick="shareBundle()">📤 &nbsp;दोस्तों को शेयर करें</button>' +
+      '<button class="share-btn" onclick="shareBundle()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4500a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> दोस्तों को शेयर करें</button>' +
     '</div>' +
   '</div>';
 }
