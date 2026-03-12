@@ -98,13 +98,14 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 
 /* ── Completion Card ── */
 .completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow: hidden; flex-shrink: 0; }
+.comp-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .comp-top { padding: 20px 20px 14px; text-align: center; background: #f7f7f5; }
 .comp-badge { width: 52px; height: 52px; border-radius: 50%; background: #6BBF4E; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .comp-badge svg { width: 26px; height: 26px; }
 .comp-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; line-height: 1.35; padding: 0 4px; }
 .comp-sub { font-size: 13px; color: #d4500a; line-height: 1.4; font-weight: 500; }
 .comp-divider { height: 1px; background: #f0f0f0; flex-shrink: 0; margin: 0 16px; }
-.comp-habit { padding: 12px 16px; background: #fff; flex: 1; display: flex; flex-direction: column; }
+.comp-habit { padding: 12px 16px; background: #fff; display: flex; flex-direction: column; }
 .comp-habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .comp-habit-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin: 0; letter-spacing: 0; text-transform: none; }
 .comp-habit-hint { font-size: 10px; color: #999; }
@@ -126,7 +127,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .timing-pill .tp-icon svg { width: 22px; height: 22px; }
 .timing-pill .tp-name { font-size: 12px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
 .timing-pill .tp-time { font-size: 10px; color: #999; margin-top: 2px; display: block; }
-.comp-share { padding: 10px 16px 14px; background: #fff; margin-top: auto; }
+.comp-share { padding: 10px 16px 14px; background: #fff; flex-shrink: 0; border-top: 1px solid #f0f0f0; }
 .share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 2px solid #d4500a; border-radius: 10px; background: none; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .share-btn:active { background: rgba(212,80,10,0.06); }
 
@@ -412,6 +413,7 @@ function buildCompletionCard() {
   var checkSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12.5L11.5 15L15.5 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   return '<div class="completion-card">' +
+    '<div class="comp-scroll">' +
     '<div class="comp-top">' +
       '<div class="comp-badge">' + checkSvg + '</div>' +
       '<div class="comp-title">आप देश-दुनिया और लोकल की सभी बड़ी खबरों से पूरी तरह अपडेट हैं</div>' +
@@ -427,7 +429,7 @@ function buildCompletionCard() {
       '<div class="comp-timing-title">एक नज़र की टाइमिंग्स</div>' +
       '<div class="timing-row">' + timingHtml + '</div>' +
     '</div>' +
-    '<div class="comp-divider"></div>' +
+    '</div>' +
     '<div class="comp-share">' +
       '<button class="share-btn" onclick="shareBundle()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4500a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> दोस्तों को शेयर करें</button>' +
     '</div>' +
