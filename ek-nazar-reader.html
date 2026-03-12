@@ -95,34 +95,34 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 @keyframes skelShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ── Completion Card ── */
-.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #f5f5f5; overflow-y: auto; flex-shrink: 0; }
-.comp-top { padding: 32px 24px 24px; text-align: center; flex-shrink: 0; background: #fff; }
-.comp-badge { width: 68px; height: 68px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-.comp-badge svg { width: 32px; height: 32px; }
-.comp-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; line-height: 1.4; padding: 0 8px; }
-.comp-sub { font-size: 14px; color: #d4500a; line-height: 1.5; font-weight: 500; }
-.comp-divider { height: 8px; background: #f5f5f5; }
-.comp-habit { padding: 20px; flex-shrink: 0; background: #fff; }
-.comp-habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.comp-habit-title { font-size: 14px; font-weight: 700; color: #1a1a1a; margin: 0; letter-spacing: 0; text-transform: none; }
-.comp-habit-hint { font-size: 11px; color: #999; }
-.habit-grid { display: flex; flex-direction: column; gap: 14px; }
-.habit-row { display: flex; align-items: center; gap: 12px; }
-.habit-slot-label { font-size: 12px; font-weight: 600; color: #666; width: 64px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; display: flex; align-items: center; gap: 4px; }
-.habit-dots { display: flex; gap: 6px; flex: 1; justify-content: flex-end; }
-.habit-dot { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #bbb; flex-shrink: 0; background: #fafafa; }
-.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 13px; }
+.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #f5f5f5; overflow: hidden; flex-shrink: 0; }
+.comp-top { padding: 20px 20px 14px; text-align: center; background: #fff; }
+.comp-badge { width: 52px; height: 52px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.comp-badge svg { width: 26px; height: 26px; }
+.comp-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; line-height: 1.35; padding: 0 4px; }
+.comp-sub { font-size: 13px; color: #d4500a; line-height: 1.4; font-weight: 500; }
+.comp-divider { height: 6px; background: #f5f5f5; flex-shrink: 0; }
+.comp-habit { padding: 12px 16px; background: #fff; }
+.comp-habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.comp-habit-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin: 0; letter-spacing: 0; text-transform: none; }
+.comp-habit-hint { font-size: 10px; color: #999; }
+.habit-grid { display: flex; flex-direction: column; gap: 8px; }
+.habit-row { display: flex; align-items: center; gap: 8px; }
+.habit-slot-label { font-size: 11px; font-weight: 600; color: #666; width: 58px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; display: flex; align-items: center; gap: 3px; }
+.habit-dots { display: flex; gap: 5px; flex: 1; justify-content: flex-end; }
+.habit-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #bbb; flex-shrink: 0; background: #fafafa; }
+.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; }
 .habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
 .habit-dot.missed { border-color: #d4500a; color: #d4500a; background: #fff; }
-.comp-timing { padding: 20px; flex-shrink: 0; background: #fff; }
-.comp-timing-title { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
-.timing-row { display: flex; gap: 10px; }
-.timing-pill { flex: 1; padding: 14px 8px 12px; border: 1.5px solid #e8e8e8; border-radius: 12px; text-align: center; background: #fafafa; }
-.timing-pill .tp-emoji { font-size: 20px; display: block; margin-bottom: 6px; }
-.timing-pill .tp-name { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
-.timing-pill .tp-time { font-size: 11px; color: #999; margin-top: 3px; display: block; }
-.comp-share { padding: 16px 20px 28px; flex-shrink: 0; background: #fff; }
-.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 2px solid #d4500a; border-radius: 12px; background: none; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.comp-timing { padding: 12px 16px; background: #fff; }
+.comp-timing-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+.timing-row { display: flex; gap: 8px; }
+.timing-pill { flex: 1; padding: 10px 6px 8px; border: 1.5px solid #e8e8e8; border-radius: 10px; text-align: center; background: #fafafa; }
+.timing-pill .tp-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
+.timing-pill .tp-name { font-size: 12px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
+.timing-pill .tp-time { font-size: 10px; color: #999; margin-top: 2px; display: block; }
+.comp-share { padding: 10px 16px 14px; background: #fff; }
+.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 2px solid #d4500a; border-radius: 10px; background: none; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .share-btn:active { background: rgba(212,80,10,0.06); }
 
 /* ── Toast ── */
