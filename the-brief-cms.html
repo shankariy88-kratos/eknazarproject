@@ -94,14 +94,6 @@
   .editor-panel { padding: 28px 36px; overflow-y: auto; border-right: 1px solid var(--border); }
   .panel-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
 
-  .image-preview { margin-bottom: 8px; }
-  .image-preview img { max-width: 120px; max-height: 80px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
-  .image-preview .img-hint { color: var(--muted); font-size: 12px; }
-  .image-preview .img-clear { font-size: 11px; color: var(--muted); margin-left: 8px; cursor: pointer; text-decoration: underline; }
-  .image-override-row { display: flex; align-items: center; gap: 6px; }
-  .image-override-row input { flex: 1; font-size: 12px; padding: 6px 10px; }
-  .image-override-row button { padding: 6px 10px; font-size: 11px; white-space: nowrap; }
-
   .summary-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 8px; }
   .summary-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
   .summary-label::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
@@ -329,15 +321,8 @@
       </div>
 
       <div class="form-group full">
-        <label>OG Image</label>
-        <input type="hidden" id="imageUrl">
-        <div class="image-preview" id="imagePreview">
-          <span class="img-hint">⚡ Extract से auto-fill होगा</span>
-        </div>
-        <div class="image-override-row">
-          <input type="url" id="imageUrlManual" placeholder="या manually image URL डालें...">
-          <button class="btn" onclick="applyManualImageUrl()">Set</button>
-        </div>
+        <label>Image URL <span style="color:var(--muted);font-weight:400;font-size:11px;">(Extract से auto-fill या manually paste करें)</span></label>
+        <input type="url" id="imageUrl" placeholder="https://images.bhaskar.com/... article image URL">
       </div>
       <div class="form-group full">
         <label>Video URL <span style="color:var(--muted);font-weight:400;font-size:11px;">(optional)</span></label>
@@ -470,15 +455,8 @@
 
       <!-- Media -->
       <div class="form-group full">
-        <label>OG Image</label>
-        <input type="hidden" id="modalImageUrl">
-        <div class="image-preview" id="modalImagePreview">
-          <span class="img-hint">No image set</span>
-        </div>
-        <div class="image-override-row">
-          <input type="url" id="modalImageUrlManual" placeholder="Image URL manually override...">
-          <button class="btn" onclick="applyModalManualImageUrl()">Set</button>
-        </div>
+        <label>Image URL</label>
+        <input type="url" id="modalImageUrl" placeholder="https://images.bhaskar.com/... article image URL">
       </div>
       <div class="form-group full">
         <label>Video URL <span style="color:var(--muted);font-weight:400;font-size:11px;">(optional)</span></label>
@@ -566,43 +544,6 @@
     document.getElementById('tab-editor').classList.toggle('active', v === 'editor');
     document.getElementById('tab-history').classList.toggle('active', v === 'history');
     if (v === 'history') renderHistory();
-  }
-
-  // ── Image Preview helpers ──
-  function updateImagePreview(url) {
-    const c = document.getElementById('imagePreview');
-    if (url) {
-      c.innerHTML = `<img src="${url}" onerror="this.outerHTML='<span class=img-hint>⚠ Image load failed</span>'"> <span class="img-clear" onclick="clearImageUrl()">✕ Clear</span>`;
-    } else {
-      c.innerHTML = '<span class="img-hint">⚡ Extract से auto-fill होगा</span>';
-    }
-  }
-  function applyManualImageUrl() {
-    const val = document.getElementById('imageUrlManual').value.trim();
-    if (!val) return;
-    document.getElementById('imageUrl').value = val;
-    document.getElementById('imageUrlManual').value = '';
-    updateImagePreview(val);
-    flashField(document.getElementById('imagePreview'));
-  }
-  function clearImageUrl() {
-    document.getElementById('imageUrl').value = '';
-    updateImagePreview('');
-  }
-  function updateModalImagePreview(url) {
-    const c = document.getElementById('modalImagePreview');
-    if (url) {
-      c.innerHTML = `<img src="${url}" onerror="this.outerHTML='<span class=img-hint>⚠ Image load failed</span>'"> <span class="img-clear" onclick="document.getElementById('modalImageUrl').value='';updateModalImagePreview('')">✕ Clear</span>`;
-    } else {
-      c.innerHTML = '<span class="img-hint">No image set</span>';
-    }
-  }
-  function applyModalManualImageUrl() {
-    const val = document.getElementById('modalImageUrlManual').value.trim();
-    if (!val) return;
-    document.getElementById('modalImageUrl').value = val;
-    document.getElementById('modalImageUrlManual').value = '';
-    updateModalImagePreview(val);
   }
 
   // ── Tag ──
@@ -743,16 +684,18 @@
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: `Use web_search to find this news article and extract its metadata: ${url}
+          messages: [{ role: 'user', content: `Use web_search to find this news article: ${url}
 
-Return ONLY a JSON object with these fields:
+Extract the COMPLETE, FULL headline — not the short SEO/meta title, but the entire headline including any subtitle after the colon (:). Bhaskar headlines often have format "मुख्य शीर्षक:उपशीर्षक" — include BOTH parts.
+
+Return ONLY a JSON object:
 {
-  "headline": "Hindi headline of the article (keep original Hindi, or translate if English)",
-  "tag": "One category from this list that best fits: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन. If none fit, suggest a short Hindi tag.",
-  "imageUrl": "The main article image URL (og:image or primary image src). Must be a full https:// URL."
+  "headline": "The COMPLETE Hindi headline including subtitle (everything before the article body starts)",
+  "tag": "One category: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन. If none fit, suggest a short Hindi tag.",
+  "imageUrl": "Article-specific image URL (NOT default og-image.png). Must be full https:// URL from images.bhaskar.com or similar CDN. If only default/placeholder image found, return empty string."
 }
 
-IMPORTANT: You MUST return valid JSON. No explanation, no apologies, no markdown fences. Just the JSON object.` }]
+IMPORTANT: Return ONLY valid JSON. No explanation, no markdown.` }]
         })
       });
 
@@ -813,14 +756,13 @@ IMPORTANT: You MUST return valid JSON. No explanation, no apologies, no markdown
       flashField(tagSel);
     }
 
-    // OG Image
+    // Image URL
     if (meta.imageUrl) {
       document.getElementById('imageUrl').value = meta.imageUrl;
-      updateImagePreview(meta.imageUrl);
-      flashField(document.getElementById('imagePreview'));
+      flashField(document.getElementById('imageUrl'));
     }
 
-    showToast('✓ Headline, Tag, Image auto-filled!');
+    showToast('✓ Headline, Tag auto-filled!' + (meta.imageUrl ? ' Image भी मिली!' : ''));
   }
 
   function flashField(el) {
@@ -928,9 +870,7 @@ IMPORTANT: You MUST return valid JSON. No explanation, no apologies, no markdown
   function clearMainForm() {
     document.getElementById('storyHeadline').innerHTML='';
     document.getElementById('summaryText').innerHTML='';
-    ['videoUrl','articleUrl'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('imageUrl').value = '';
-    updateImagePreview('');
+    ['imageUrl','videoUrl','articleUrl'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('summaryArea').style.display='none';
     // Reset to AI mode
     document.querySelector('input[name="summaryMode"][value="ai"]').checked = true;
@@ -1254,7 +1194,6 @@ IMPORTANT: You MUST return valid JSON. No explanation, no apologies, no markdown
     }
     document.getElementById('modalImageUrl').value = imgUrl;
     document.getElementById('modalVideoUrl').value = vidUrl;
-    updateModalImagePreview(imgUrl);
 
     // Summary mode — default AI
     document.querySelector('input[name="modalSummaryMode"][value="ai"]').checked = true;
