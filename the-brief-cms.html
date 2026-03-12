@@ -610,13 +610,37 @@
   async function callSummarize(url) {
     const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
     if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); throw new Error('[E08] API Key missing'); }
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
+
+    const SUMMARY_PROMPT = `Write a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else`;
+
+    // Tier 1: Try fetching actual article HTML
+    let articleText = '';
+    try {
+      const html = await fetchArticleHtml(url);
+      articleText = extractArticleText(html);
+    } catch (e) {
+      console.log('Summarize Tier 1 (fetch) failed:', e.message);
+    }
+
+    let body;
+    if (articleText && articleText.length >= 100) {
+      // Tier 1 succeeded: send real article text (no web_search needed, faster + cheaper)
+      body = {
+        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n${articleText}\n---\n\n${SUMMARY_PROMPT}` }]
+      };
+    } else {
+      // Tier 2: Fallback to web_search (less reliable but works for indexed articles)
+      body = {
         model: 'claude-sonnet-4-20250514', max_tokens: 1000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Please fetch and read the article at this URL: ${url}\n\nWrite a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else` }]
-      })
+        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Search for and read this article: ${url}\n\n${SUMMARY_PROMPT}` }]
+      };
+    }
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify(body)
     });
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
@@ -629,12 +653,17 @@
     const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
     if (!apiKey) { toggleKeyPanel(); throw new Error('[E08] API Key missing'); }
     const hasUrl = url && url.trim();
-    const tools = hasUrl ? [{ type: 'web_search_20250305', name: 'web_search' }] : [];
+    let articleContext = '';
+    if (hasUrl && !existingText) {
+      try {
+        const html = await fetchArticleHtml(url);
+        articleContext = extractArticleText(html);
+      } catch(e) { /* fallback: proceed without article text */ }
+    }
     const prompt = existingText
       ? `You are editing an existing Hindi news summary. Current summary:\n${existingText}\n\nInstruction: ${instruction}\n\nReturn only the updated bullet points, each starting with •, nothing else.`
-      : `You are an editorial assistant for Dainik Bhaskar. Fetch and read: ${url}\n\nInstruction: ${instruction}\n\nReturn only bullet points, each starting with •, in simple Hindi, max 15 words each, bold key facts with **bold**. Nothing else.`;
+      : `You are an editorial assistant for Dainik Bhaskar.\n\nArticle text:\n---\n${articleContext}\n---\n\nInstruction: ${instruction}\n\nReturn only bullet points, each starting with •, in simple Hindi, max 15 words each, bold key facts with **bold**. Nothing else.`;
     const body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] };
-    if (tools.length) body.tools = tools;
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify(body)
@@ -647,6 +676,80 @@
   }
 
   // ── Extract metadata from URL ──
+  // ── Fetch actual article HTML via CORS proxy ──
+  async function fetchArticleHtml(url) {
+    // Primary: allorigins.win /get endpoint (returns JSON with contents field)
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      if (json.contents && json.contents.length > 500 && !json.contents.includes('Attention Required')) {
+        return json.contents;
+      }
+      throw new Error('Cloudflare blocked or empty response');
+    } catch (e) {
+      // Fallback: allorigins /raw endpoint
+      try {
+        const rawUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const resp2 = await fetch(rawUrl, { signal: AbortSignal.timeout(15000) });
+        if (!resp2.ok) throw new Error(`HTTP ${resp2.status}`);
+        const html = await resp2.text();
+        if (html.length > 500 && !html.includes('Attention Required')) return html;
+        throw new Error('Cloudflare blocked');
+      } catch (e2) {
+        throw new Error('Article fetch failed — site ने block किया। Manual mode use करें।');
+      }
+    }
+  }
+
+  function parseOgTags(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const getMeta = (prop) => {
+      const el = doc.querySelector(`meta[property="${prop}"]`) || doc.querySelector(`meta[name="${prop}"]`);
+      return el ? el.getAttribute('content')?.trim() || '' : '';
+    };
+    const title = getMeta('og:title') || doc.querySelector('title')?.textContent?.trim() || '';
+    let image = getMeta('og:image');
+    // Reject default placeholder images
+    if (image && /\/default\/|placeholder|og-image\.png/i.test(image)) image = '';
+    const description = getMeta('og:description');
+    return { title, image, description };
+  }
+
+  function extractArticleText(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    // Remove scripts, styles, nav, footer, ads
+    doc.querySelectorAll('script,style,nav,footer,aside,.ad,.ads,.advertisement,iframe,noscript').forEach(el => el.remove());
+    // Try article-specific selectors first (Bhaskar patterns)
+    const articleEl = doc.querySelector('article') || doc.querySelector('.article-content') ||
+                      doc.querySelector('.story-content') || doc.querySelector('.article_content') ||
+                      doc.querySelector('[itemprop="articleBody"]') || doc.querySelector('.main-content') ||
+                      doc.querySelector('#article-body');
+    const source = articleEl || doc.body;
+    const text = source?.innerText || source?.textContent || '';
+    // Clean up excessive whitespace
+    return text.replace(/\n{3,}/g, '\n\n').replace(/[ \t]+/g, ' ').trim().substring(0, 8000);
+  }
+
+  function guessTag(url, ogTitle) {
+    const u = url.toLowerCase();
+    const t = (ogTitle || '').toLowerCase();
+    if (/\/sports?\/|\/cricket\/|\/football\/|\/ipl\//i.test(u)) return 'स्पोर्ट्स';
+    if (/\/business\/|\/money\/|\/market\//i.test(u)) return 'बिजनेस';
+    if (/\/entertainment\/|\/bollywood\//i.test(u)) return 'बॉलीवुड';
+    if (/\/lifestyle\/|\/health\//i.test(u)) return 'लाइफस्टाइल';
+    if (/\/tech|\/gadget/i.test(u)) return 'टेक्नोलॉजी';
+    if (/\/crime\/|\/murder/i.test(u)) return 'क्राइम';
+    if (/\/education\//i.test(u)) return 'एजुकेशन';
+    if (/\/rajasthan\//i.test(u)) return 'राजस्थान';
+    if (/\/international\/|\/world\//i.test(u)) return 'विदेश';
+    if (/\/national\/|\/india\//i.test(u)) return 'देश';
+    // Bikaner-specific
+    if (/\/bikaner\//i.test(u) || /बीकानेर/.test(t)) return 'बीकानेर';
+    return 'देश';
+  }
+
   async function extractFromUrl() {
     const urlInput = document.getElementById('articleUrl');
     let url = urlInput.value.trim();
@@ -657,83 +760,59 @@
       return;
     }
 
-    // Block shortened URLs — web search cannot resolve them
+    // Block shortened URLs — CORS proxy can't follow all redirects
     const isShortUrl = /^https?:\/\/(dainik\.bhaskar\.com|bfrk\.in|bit\.ly|t\.co)\/[a-zA-Z0-9]{4,20}$/i.test(url);
     if (isShortUrl) {
       showError('⚠️ Short URL काम नहीं करेगा — पहले ये link browser में खोलें, फिर address bar से full URL copy करें (www.bhaskar.com/local/... वाला)');
       return;
     }
 
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
-
     hideError();
     document.getElementById('extractBtn').disabled = true;
     document.getElementById('extractLoading').style.display = 'flex';
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 500,
-          tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: `Search for this Dainik Bhaskar news article using web_search: ${url}
-
-Search query hint: "${url.split('/').pop().replace(/\.html?$/,'').replace(/-\d+$/,'').replace(/-/g,' ')}"
-
-From the search results, extract:
-1. The COMPLETE Hindi headline including any subtitle after colon (:). Bhaskar format: "मुख्य शीर्षक:उप शीर्षक" — include ALL parts.
-2. Category tag
-3. Article image URL from CDN (images.bhaskar.com or bhaskarassets.com), NOT default placeholder images.
-
-Return ONLY this JSON:
-{
-  "headline": "COMPLETE headline with subtitle in Hindi",
-  "tag": "One of: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन (or suggest short Hindi tag)",
-  "imageUrl": "CDN image URL or empty string if not found"
-}
-
-CRITICAL RULES:
-- NEVER put apologies or explanations inside JSON field values
-- If you cannot find a field, use empty string ""
-- headline must be in Hindi, from actual article content, NOT your own text
-- Return ONLY valid JSON. Nothing else.` }]
-        })
-      });
-
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-
-      const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
-      if (!text) throw new Error('कोई response नहीं मिला');
-
-      // Parse JSON from response — handle potential markdown fences
-      let jsonStr = text;
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) jsonStr = jsonMatch[0];
-
-      let meta;
+      // Tier 1: Fetch actual HTML and parse OG tags (fast, accurate, no API cost)
+      let meta = null;
       try {
-        meta = JSON.parse(jsonStr);
-      } catch (parseErr) {
-        // API returned text instead of JSON — show what it said
-        const preview = text.substring(0, 120);
-        throw new Error('API ने JSON नहीं दिया: "' + preview + '..."');
+        const html = await fetchArticleHtml(url);
+        const og = parseOgTags(html);
+        if (og.title) {
+          meta = { headline: og.title, tag: guessTag(url, og.title), imageUrl: og.image || '' };
+        }
+      } catch (fetchErr) {
+        console.log('Tier 1 (CORS fetch) failed:', fetchErr.message);
       }
 
-      // Guard: reject if model put apology text in headline
-      if (meta.headline && /^(sorry|i cannot|i could|i was|i'm|unable|unfortunately)/i.test(meta.headline.trim())) {
-        meta.headline = '';
+      // Tier 2: Fallback to web_search API (for Cloudflare-blocked sites)
+      if (!meta || !meta.headline) {
+        const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
+        if (!apiKey) { toggleKeyPanel(); throw new Error('API Key सेट नहीं — 🔑 बटन से key डालें'); }
+        const searchHint = url.split('/').pop().replace(/\.html?$/,'').replace(/-\d+$/,'').replace(/-/g,' ');
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514', max_tokens: 500,
+            tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+            messages: [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"Hindi category","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }]
+          })
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          meta = JSON.parse(jsonMatch[0]);
+          if (meta.headline && /^(sorry|i cannot|i could|i was|i'm|unable|unfortunately)/i.test(meta.headline.trim())) meta.headline = '';
+          if (!meta.tag) meta.tag = guessTag(url, meta.headline);
+        }
       }
 
-      // Populate fields with highlight animation
+      if (!meta || (!meta.headline && !meta.imageUrl)) {
+        throw new Error('Headline/image नहीं मिली — URL check करें या manually भरें');
+      }
+
       populateExtracted(meta);
 
     } catch (e) {
