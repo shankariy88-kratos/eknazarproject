@@ -684,18 +684,27 @@
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: `Use web_search to find this news article: ${url}
+          messages: [{ role: 'user', content: `Search for this Dainik Bhaskar news article using web_search: ${url}
 
-Extract the COMPLETE, FULL headline — not the short SEO/meta title, but the entire headline including any subtitle after the colon (:). Bhaskar headlines often have format "मुख्य शीर्षक:उपशीर्षक" — include BOTH parts.
+Search query hint: "${url.split('/').pop().replace(/\.html?$/,'').replace(/-\d+$/,'').replace(/-/g,' ')}"
 
-Return ONLY a JSON object:
+From the search results, extract:
+1. The COMPLETE Hindi headline including any subtitle after colon (:). Bhaskar format: "मुख्य शीर्षक:उप शीर्षक" — include ALL parts.
+2. Category tag
+3. Article image URL from CDN (images.bhaskar.com or bhaskarassets.com), NOT default placeholder images.
+
+Return ONLY this JSON:
 {
-  "headline": "The COMPLETE Hindi headline including subtitle (everything before the article body starts)",
-  "tag": "One category: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन. If none fit, suggest a short Hindi tag.",
-  "imageUrl": "Article-specific image URL (NOT default og-image.png). Must be full https:// URL from images.bhaskar.com or similar CDN. If only default/placeholder image found, return empty string."
+  "headline": "COMPLETE headline with subtitle in Hindi",
+  "tag": "One of: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन (or suggest short Hindi tag)",
+  "imageUrl": "CDN image URL or empty string if not found"
 }
 
-IMPORTANT: Return ONLY valid JSON. No explanation, no markdown.` }]
+CRITICAL RULES:
+- NEVER put apologies or explanations inside JSON field values
+- If you cannot find a field, use empty string ""
+- headline must be in Hindi, from actual article content, NOT your own text
+- Return ONLY valid JSON. Nothing else.` }]
         })
       });
 
@@ -717,6 +726,11 @@ IMPORTANT: Return ONLY valid JSON. No explanation, no markdown.` }]
         // API returned text instead of JSON — show what it said
         const preview = text.substring(0, 120);
         throw new Error('API ने JSON नहीं दिया: "' + preview + '..."');
+      }
+
+      // Guard: reject if model put apology text in headline
+      if (meta.headline && /^(sorry|i cannot|i could|i was|i'm|unable|unfortunately)/i.test(meta.headline.trim())) {
+        meta.headline = '';
       }
 
       // Populate fields with highlight animation
