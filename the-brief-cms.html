@@ -716,11 +716,11 @@
       return;
     }
 
-    // Warn about shortened URLs that web search can't resolve
-    const isShortUrl = /^https?:\/\/dainik\.bhaskar\.com\/[a-zA-Z0-9]{6,15}$/.test(url);
+    // Block shortened URLs — web search cannot resolve them
+    const isShortUrl = /^https?:\/\/(dainik\.bhaskar\.com|bfrk\.in|bit\.ly|t\.co)\/[a-zA-Z0-9]{4,20}$/i.test(url);
     if (isShortUrl) {
-      showError('⚠️ Short URL detected — Extract बेहतर काम करेगा अगर आप full article URL paste करें (www.bhaskar.com/... वाला)');
-      // Don't return — still try, but warn
+      showError('⚠️ Short URL काम नहीं करेगा — पहले ये link browser में खोलें, फिर address bar से full URL copy करें (www.bhaskar.com/local/... वाला)');
+      return;
     }
 
     const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
@@ -731,20 +731,6 @@
     document.getElementById('extractLoading').style.display = 'flex';
 
     try {
-      // Step 1: Resolve shortened URLs (dainik.bhaskar.com/xxx → full URL)
-      let resolvedUrl = url;
-      try {
-        const probe = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-        if (probe.url && probe.url !== url) {
-          resolvedUrl = probe.url;
-          urlInput.value = resolvedUrl; // update the field with full URL
-        }
-      } catch (e) {
-        // CORS may block HEAD — try fetching page title from the short URL via search
-        console.log('URL resolve skipped (CORS):', e.message);
-      }
-
-      // Step 2: Call Claude API with web_search
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -757,9 +743,7 @@
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: `Search for this news article and extract metadata: ${resolvedUrl}
-
-If the URL looks like a shortened link, search for keywords from the domain to find the actual article.
+          messages: [{ role: 'user', content: `Use web_search to find this news article and extract its metadata: ${url}
 
 Return ONLY a JSON object with these fields:
 {
