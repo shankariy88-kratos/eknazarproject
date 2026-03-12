@@ -287,15 +287,13 @@
         </select>
       </div>
 
-      <div class="form-group">
-        <label>Tag / Category</label>
-        <select id="storyTag" onchange="handleTagChange(this)"></select>
-        <div id="customTagRow" style="display:none;flex-direction:column;gap:6px;margin-top:8px;">
-          <div style="display:flex;gap:8px;">
-            <input type="text" id="customTagInput" placeholder="नया टैग लिखें...">
-            <button class="btn btn-primary" style="padding:9px 13px;font-size:12px;" onclick="saveCustomTag()">जोड़ें</button>
-          </div>
+      <div class="form-group full">
+        <label>Article URL</label>
+        <div class="url-row">
+          <input type="url" id="articleUrl" placeholder="https://www.bhaskar.com/... article URL paste करें">
+          <button class="btn btn-primary" id="extractBtn" onclick="extractFromUrl()" style="background:#1a6b3a;color:#fff;">⚡ Extract</button>
         </div>
+        <div id="extractLoading" style="display:none;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:6px;"><div class="spinner"></div><span>Article से headline, tag, media निकाल रहे हैं...</span></div>
       </div>
 
       <div class="form-group full">
@@ -314,6 +312,17 @@
             <button class="ct-reset" onclick="applyHeadlineColor('')" title="Reset color">✕ Reset</button>
           </div>
           <div id="storyHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..." onpaste="pastePlain(event, this)"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tag / Category</label>
+        <select id="storyTag" onchange="handleTagChange(this)"></select>
+        <div id="customTagRow" style="display:none;flex-direction:column;gap:6px;margin-top:8px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="customTagInput" placeholder="नया टैग लिखें...">
+            <button class="btn btn-primary" style="padding:9px 13px;font-size:12px;" onclick="saveCustomTag()">जोड़ें</button>
+          </div>
         </div>
       </div>
 
@@ -338,19 +347,9 @@
             ✍ खुद लिखें
           </label>
         </div>
-        <div id="aiModeRow" class="url-row">
-          <input type="url" id="articleUrl" placeholder="https://www.bhaskar.com/...">
-          <button class="btn btn-primary" id="summarizeBtn" onclick="summarizeArticle()">✦ Summarize</button>
+        <div id="aiModeRow">
+          <button class="btn btn-primary" id="summarizeBtn" onclick="summarizeArticle()" style="width:100%;">✦ Summarize from Article URL</button>
         </div>
-      </div>
-
-      <div class="form-group full">
-        <label>App Deep Link</label>
-        <div class="url-row">
-          <input type="text" id="deepLink" placeholder="bhaskar://story/12345 या article URL paste करें">
-          <button class="btn btn-primary" id="extractBtn" onclick="extractFromUrl()" style="background:#1a6b3a;color:#fff;">⚡ Extract</button>
-        </div>
-        <div id="extractLoading" style="display:none;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:6px;"><div class="spinner"></div><span>Article से headline, tag, media निकाल रहे हैं...</span></div>
       </div>
     </div>
 
@@ -518,11 +517,6 @@
         </div>
       </div>
 
-      <!-- Deep link -->
-      <div class="form-group full">
-        <label>App Deep Link</label>
-        <input type="text" id="modalDeepLink" placeholder="bhaskar://story/12345">
-      </div>
     </div>
 
     <div class="modal-footer">
@@ -670,15 +664,11 @@
 
   // ── Extract metadata from URL ──
   async function extractFromUrl() {
-    const urlInput = document.getElementById('deepLink');
+    const urlInput = document.getElementById('articleUrl');
     let url = urlInput.value.trim();
-    if (!url) { showError('[E12] URL खाली है — Deep Link या article URL paste करें'); return; }
+    if (!url) { showError('[E12] URL खाली है — Article URL paste करें'); return; }
 
-    // If it's a deep link like bhaskar://story/xxx, try to convert or use as-is
-    // If it starts with http, use directly
     if (!url.startsWith('http')) {
-      // Try to extract article URL from deep link pattern
-      // For now, show error if not a web URL
       showError('[E13] Extract के लिए http/https URL चाहिए — article का web URL paste करें');
       return;
     }
@@ -781,14 +771,6 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
       }
     }
 
-    // Also populate the article URL field for potential summarization later
-    const articleUrlField = document.getElementById('articleUrl');
-    const deepLinkUrl = document.getElementById('deepLink').value.trim();
-    if (deepLinkUrl.startsWith('http') && !articleUrlField.value.trim()) {
-      articleUrlField.value = deepLinkUrl;
-      flashField(articleUrlField);
-    }
-
     showToast('✓ Headline, Tag, Media auto-filled!');
   }
 
@@ -882,15 +864,14 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
     if (!tag) { showError('[E09] Tag/Category जरूरी है — ऊपर category चुनें'); return; }
     const mediaUrlVal = document.getElementById('mediaUrl').value.trim();
     if (!mediaUrlVal) { showError('[E10] Image या Video URL जरूरी है — Media section में URL डालें'); return; }
-    const deepLinkVal = document.getElementById('deepLink').value.trim();
-    if (!deepLinkVal) { showError('[E11] App Deep Link जरूरी है — bhaskar:// link डालें'); return; }
+    const articleUrlVal = document.getElementById('articleUrl').value.trim();
     stories.push({ id: Date.now(), tag,
       headline: headlineHTML,
       summary: summaryHTML,
       mediaType,
       mediaUrl:   mediaUrlVal,
-      articleUrl: document.getElementById('articleUrl').value.trim(),
-      deepLink:   deepLinkVal });
+      articleUrl: articleUrlVal,
+      deepLink:   articleUrlVal });
     renderLiveBundle(); clearMainForm(); hideError();
     if (jsonVisible) updateJSON();
   }
@@ -898,7 +879,7 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
   function clearMainForm() {
     document.getElementById('storyHeadline').innerHTML='';
     document.getElementById('summaryText').innerHTML='';
-    ['mediaUrl','articleUrl','deepLink'].forEach(id=>document.getElementById(id).value='');
+    ['mediaUrl','articleUrl'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('summaryArea').style.display='none';
     // Reset to AI mode
     document.querySelector('input[name="summaryMode"][value="ai"]').checked = true;
@@ -1218,7 +1199,7 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
     setModalSummaryMode('ai');
 
     document.getElementById('modalArticleUrl').value = story?.articleUrl || '';
-    document.getElementById('modalDeepLink').value = story?.deepLink || '';
+    // deepLink auto-derived from articleUrl
     populateTagSelect('modalTag', story?.tag || DEFAULT_TAGS[0]);
     updateModalWC();
     document.getElementById('modalOverlay').classList.add('open');
@@ -1282,10 +1263,8 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
     if (!tag) { alert('E09: Tag/Category जरूरी है'); return; }
     const mediaUrl = document.getElementById('modalMediaUrl').value.trim();
     if (!mediaUrl) { alert('E10: Image या Video URL जरूरी है'); document.getElementById('modalMediaUrl').focus(); return; }
-    const deepLink = document.getElementById('modalDeepLink').value.trim();
-    if (!deepLink) { alert('E11: App Deep Link जरूरी है'); document.getElementById('modalDeepLink').focus(); return; }
     const articleUrl = document.getElementById('modalArticleUrl').value.trim();
-    const storyData = { tag, headline, summary, deepLink, articleUrl, mediaUrl, mediaType: modalMediaType };
+    const storyData = { tag, headline, summary, deepLink: articleUrl, articleUrl, mediaUrl, mediaType: modalMediaType };
 
     if (ctx.mode === 'live-edit') {
       const s = stories.find(s => s.id === ctx.storyId);
