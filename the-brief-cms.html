@@ -736,16 +736,16 @@
           model: 'claude-sonnet-4-20250514',
           max_tokens: 500,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: `Fetch and read this news article: ${url}
+          messages: [{ role: 'user', content: `Use the web_search tool to search for this URL and extract article metadata: ${url}
 
-Extract ONLY these fields and return as valid JSON (nothing else, no markdown):
+After searching, return ONLY a JSON object with these fields:
 {
   "headline": "Hindi headline of the article (keep original Hindi, or translate if English)",
   "tag": "One category from this list that best fits: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, क्राइम, टेक्नोलॉजी, हेल्थ, एजुकेशन. If none fit, suggest a short Hindi tag.",
   "imageUrl": "The main article image URL (og:image or primary image src). Must be a full https:// URL."
 }
 
-Return ONLY the JSON object. No explanation, no markdown fences.` }]
+IMPORTANT: You MUST return valid JSON. No explanation, no apologies, no markdown fences. Just the JSON object.` }]
         })
       });
 
@@ -760,7 +760,14 @@ Return ONLY the JSON object. No explanation, no markdown fences.` }]
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) jsonStr = jsonMatch[0];
 
-      const meta = JSON.parse(jsonStr);
+      let meta;
+      try {
+        meta = JSON.parse(jsonStr);
+      } catch (parseErr) {
+        // API returned text instead of JSON — show what it said
+        const preview = text.substring(0, 120);
+        throw new Error('API ने JSON नहीं दिया: "' + preview + '..."');
+      }
 
       // Populate fields with highlight animation
       populateExtracted(meta);
