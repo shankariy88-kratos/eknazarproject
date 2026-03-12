@@ -63,6 +63,36 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f0ece4; hei
 .anim-bar { width: 60px; height: 3px; background: #e8e0d4; border-radius: 2px; overflow: hidden; margin-top: 8px; }
 .anim-fill { height: 100%; background: #d4500a; animation: fill 1.8s ease-in-out infinite alternate; }
 @keyframes fill { from { width: 10%; } to { width: 90%; } }
+/* ── Completion card ── */
+.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow-y: auto; flex-shrink: 0; }
+.comp-top { padding: 24px 20px 16px; text-align: center; flex-shrink: 0; }
+.comp-badge { width: 56px; height: 56px; border-radius: 50%; background: rgba(212,80,10,0.1); border: 2px solid rgba(212,80,10,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; }
+.comp-title { font-size: 18px; font-weight: 700; color: #1a1208; margin-bottom: 6px; line-height: 1.3; }
+.comp-sub { font-size: 13px; color: #7a6a52; line-height: 1.5; }
+.comp-divider { height: 1px; background: #e8e0d4; margin: 0 20px; }
+.comp-habit { padding: 16px 20px; flex-shrink: 0; }
+.comp-habit-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6a52; margin-bottom: 12px; }
+.habit-grid { display: flex; flex-direction: column; gap: 8px; }
+.habit-row { display: flex; align-items: center; gap: 8px; }
+.habit-slot-label { font-size: 11px; font-weight: 600; color: #7a6a52; width: 52px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; }
+.habit-dots { display: flex; gap: 5px; flex: 1; }
+.habit-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #e8e0d4; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #b0a090; flex-shrink: 0; background: #faf7f2; }
+.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 11px; }
+.habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
+.comp-next { padding: 12px 20px; flex-shrink: 0; }
+.comp-next-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6a52; margin-bottom: 10px; }
+.next-slot-row { display: flex; gap: 8px; }
+.next-slot-pill { flex: 1; padding: 10px 8px; border: 1.5px solid #e8e0d4; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; background: #faf7f2; }
+.next-slot-pill.available { border-color: rgba(212,80,10,0.3); background: rgba(212,80,10,0.05); }
+.next-slot-pill.active-now { border-color: #d4500a; background: rgba(212,80,10,0.08); }
+.next-slot-pill .nsp-emoji { font-size: 16px; display: block; margin-bottom: 3px; }
+.next-slot-pill .nsp-name { font-size: 11px; font-weight: 600; color: #1a1208; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
+.next-slot-pill .nsp-status { font-size: 9px; color: #7a6a52; margin-top: 2px; display: block; }
+.next-slot-pill.available .nsp-status { color: #d4500a; }
+.comp-share { padding: 12px 20px 20px; flex-shrink: 0; }
+.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1.5px solid #e8e0d4; border-radius: 10px; background: none; color: #7a6a52; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.share-btn:active { border-color: #d4500a; color: #d4500a; background: rgba(212,80,10,0.05); }
+
 .skel-card { min-width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; }
 .skel-img { width: 100%; height: 170px; background: #ede8e0; flex-shrink: 0; animation: shimmer 1.5s infinite; }
 .skel-body { padding: 16px; flex: 1; }
@@ -242,30 +272,117 @@ function renderCards() {
 
     html += '<div class="news-card">' + mediaHtml + '<div class="card-body"><div class="card-headline">' + (s.headline||'') + '</div><div class="card-divider"></div><div class="card-bullets">' + bh + '</div></div></div>';
   }
+  // Append completion card
+  html += buildCompletionCard();
   track.innerHTML = html;
   goTo(0, false);
+}
+
+function buildCompletionCard() {
+  var today = getToday();
+  var all = loadBundles().filter(function(b) { return b.date === today; });
+  var publishedSlots = all.map(function(b) { return b.slot; });
+  var allSlots = ['सुबह', 'दोपहर', 'शाम'];
+  var slotEmojis = { 'सुबह': '🌅', 'दोपहर': '☀️', 'शाम': '🌆' };
+  var slotTimes = { 'सुबह': '7:00 AM', 'दोपहर': '2:00 PM', 'शाम': '7:00 PM' };
+
+  // Build 7-day habit grid
+  var habitHtml = '';
+  var dayLabels = ['सो', 'म', 'म', 'ब', 'ग', 'शु', 'श'];
+  for (var si = 0; si < allSlots.length; si++) {
+    var slot = allSlots[si];
+    var dotsHtml = '';
+    for (var d = 6; d >= 0; d--) {
+      var dt = new Date(now.getTime() - d * 86400000);
+      var dtStr = dt.toISOString().split('T')[0];
+      var bundles = loadBundles().filter(function(b) { return b.date === dtStr && b.slot === slot; });
+      var isToday = (dtStr === today);
+      var isDone = bundles.length > 0 && (d > 0 || publishedSlots.indexOf(slot) !== -1);
+      var isCurrent = isToday && slot === currentSlot;
+      var dotClass = 'habit-dot' + (isCurrent ? ' done' : isDone ? ' done' : isToday ? ' today' : '');
+      var dotContent = (isCurrent || isDone) ? '✓' : (isToday ? '·' : dayLabels[6 - d]);
+      dotsHtml += '<div class="' + dotClass + '">' + dotContent + '</div>';
+    }
+    habitHtml += '<div class="habit-row"><div class="habit-slot-label">' + slotEmojis[slot] + ' ' + slot + '</div><div class="habit-dots">' + dotsHtml + '</div></div>';
+  }
+
+  // Next slots
+  var nextHtml = '';
+  for (var ni = 0; ni < allSlots.length; ni++) {
+    var ns = allSlots[ni];
+    var isPublished = publishedSlots.indexOf(ns) !== -1;
+    var isCurrentSlot = (ns === currentSlot);
+    var pillClass = 'next-slot-pill' + (isCurrentSlot ? '' : isPublished ? ' available' : '');
+    var statusText = isCurrentSlot ? 'अभी पढ़ रहे हैं' : isPublished ? 'उपलब्ध है →' : slotTimes[ns] + ' पर';
+    var onclick = (!isCurrentSlot && isPublished) ? ' onclick="switchSlot(this.dataset.slot)" data-slot="' + ns + '"' : '';
+    nextHtml += '<div class="' + pillClass + '"' + onclick + '><span class="nsp-emoji">' + slotEmojis[ns] + '</span><span class="nsp-name">' + ns + '</span><span class="nsp-status">' + statusText + '</span></div>';
+  }
+
+  var slotTitles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
+  return '<div class="completion-card">' +
+    '<div class="comp-top">' +
+      '<div class="comp-badge">✓</div>' +
+      '<div class="comp-title">' + slotTitles[currentSlot] + ' सभी खबरें पढ़ लीं!</div>' +
+      '<div class="comp-sub">आज की ' + currentSlot + ' की एक नज़र पूरी हो गई।<br>आप अपडेट हैं।</div>' +
+    '</div>' +
+    '<div class="comp-divider"></div>' +
+    '<div class="comp-habit">' +
+      '<div class="comp-habit-title">आपकी reading streak</div>' +
+      '<div class="habit-grid">' + habitHtml + '</div>' +
+    '</div>' +
+    '<div class="comp-divider"></div>' +
+    '<div class="comp-next">' +
+      '<div class="comp-next-title">दूसरी खबरें</div>' +
+      '<div class="next-slot-row">' + nextHtml + '</div>' +
+    '</div>' +
+    '<div class="comp-share">' +
+      '<button class="share-btn" onclick="shareBundle()">📤 &nbsp;दोस्तों को शेयर करें</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function shareBundle() {
+  var text = 'एक नज़र — Dainik Bhaskar की ' + currentSlot + ' की खबरें पढ़ी मैंने। आप भी पढ़ें!';
+  if (navigator.share) {
+    navigator.share({ title: 'एक नज़र', text: text, url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(text + '\n' + window.location.href).then(function() {
+      var btn = document.querySelector('.share-btn');
+      if (btn) { btn.textContent = '✓ लिंक कॉपी हो गया!'; setTimeout(function() { btn.innerHTML = '📤 &nbsp;दोस्तों को शेयर करें'; }, 2000); }
+    });
+  }
 }
 
 function goTo(idx, animate) {
   if (typeof animate === 'undefined') animate = true;
   if (!cards.length) return;
-  idx = Math.max(0, Math.min(idx, cards.length - 1));
+  // cards.length is the completion card index
+  idx = Math.max(0, Math.min(idx, cards.length));
   currentIdx = idx;
   var track = document.getElementById('cardTrack');
   if (!animate) track.style.transition = 'none';
   track.style.transform = 'translateX(-' + (idx * 100) + '%)';
   if (!animate) setTimeout(function() { track.style.transition = ''; }, 50);
-  updateCounter(idx+1, cards.length);
-  updateProgress(idx+1, cards.length);
-  var s = cards[idx];
-  if (s) {
-    var btn = document.getElementById('readMoreBtn');
-    btn.href = s.deepLink || s.articleUrl || '#';
-    btn.style.opacity = (s.deepLink || s.articleUrl) ? '1' : '0.4';
+  var isCompletion = (idx === cards.length);
+  var footer = document.getElementById('cardFooter');
+  if (isCompletion) {
+    updateCounter(cards.length, cards.length);
+    updateProgress(cards.length, cards.length);
+    footer.style.display = 'none';
+  } else {
+    updateCounter(idx+1, cards.length);
+    updateProgress(idx+1, cards.length);
+    footer.style.display = 'block';
+    var s = cards[idx];
+    if (s) {
+      var btn = document.getElementById('readMoreBtn');
+      btn.href = s.deepLink || s.articleUrl || '#';
+      btn.style.opacity = (s.deepLink || s.articleUrl) ? '1' : '0.4';
+    }
   }
   var pb = document.getElementById('prevBtn'); var nb = document.getElementById('nextBtn');
   if (pb) pb.disabled = idx === 0;
-  if (nb) nb.disabled = idx === cards.length - 1;
+  if (nb) nb.disabled = isCompletion;
 }
 
 function updateCounter(c,t) { document.getElementById('curNum').textContent = c||'—'; document.getElementById('totNum').textContent = t||'—'; }
