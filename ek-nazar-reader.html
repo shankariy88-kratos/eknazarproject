@@ -18,15 +18,16 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .topbar-title { font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.3; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
 .topbar-title .brand { color: #d4500a; font-weight: 700; }
 .topbar-title .date { color: #999; font-weight: 400; font-size: 13px; }
-.card-counter { width: 40px; height: 28px; background: #d4500a; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; letter-spacing: -0.3px; }
+.card-counter { min-width: 40px; height: 28px; padding: 0 10px; background: #333; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; letter-spacing: -0.3px; }
 
 /* ── Slot Tabs ── */
-.slot-tabs { background: #fff; display: flex; flex-shrink: 0; padding: 0; }
+.slot-tabs { background: #fff; display: flex; flex-shrink: 0; padding: 0; border-bottom: 1px solid #f0f0f0; }
 .slot-tab { flex: 1; padding: 10px 4px 8px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; border: none; background: none; font-family: 'Noto Sans Devanagari', sans-serif; transition: all 0.2s; text-align: center; position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.slot-tab::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2.5px; background: transparent; border-radius: 2px; transition: all 0.2s; }
-.slot-tab.active { color: #d4500a; }
+.slot-tab::after { content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%; height: 2.5px; background: transparent; border-radius: 2px; transition: all 0.2s; }
+.slot-tab.active { color: #1a1a1a; font-weight: 700; }
 .slot-tab.active::after { background: #d4500a; }
-.slot-tab .tab-icon { font-size: 14px; }
+.slot-tab .tab-icon { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.slot-tab .tab-icon svg { width: 20px; height: 20px; }
 .fresh-dot { display: none; width: 6px; height: 6px; background: #d4500a; border-radius: 50%; flex-shrink: 0; }
 .slot-tab.has-fresh .fresh-dot { display: block; }
 .slot-tab.active .fresh-dot { display: none; }
@@ -59,7 +60,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .card-divider { height: 1px; background: #f0f0f0; margin-bottom: 14px; }
 .card-bullets { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
 .bullet-item { display: flex; align-items: flex-start; gap: 10px; }
-.bullet-dot { color: #1a1a1a; font-size: 6px; line-height: 1.7; flex-shrink: 0; margin-top: 7px; width: 6px; height: 6px; background: #1a1a1a; border-radius: 50; display: block; }
+.bullet-dot { color: #1a1a1a; font-size: 6px; line-height: 1.7; flex-shrink: 0; margin-top: 7px; width: 6px; height: 6px; background: #1a1a1a; border-radius: 50%; display: block; }
 .bullet-text { font-size: 14.5px; font-weight: 400; line-height: 1.65; color: #333; }
 .bullet-text strong, .bullet-text b { font-weight: 700; color: #1a1a1a; }
 
@@ -80,7 +81,8 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 
 /* ── Empty / Waiting State ── */
 .state-screen { min-width: 100%; min-height: 300px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; background: #fff; gap: 10px; }
-.state-icon { width: 72px; height: 72px; background: rgba(212,80,10,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 6px; }
+.state-icon { width: 72px; height: 72px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.state-icon svg { width: 72px; height: 72px; }
 .state-title { font-size: 18px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
 .state-sub { font-size: 13px; color: #999; line-height: 1.5; }
 .anim-bar { width: 48px; height: 3px; background: #f0f0f0; border-radius: 2px; overflow: hidden; margin-top: 10px; }
@@ -89,15 +91,15 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 
 /* ── Skeleton Loading ── */
 .skel-card { min-width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; }
-.skel-img { width: 100%; height: 200px; background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; flex-shrink: 0; animation: skelShimmer 1.5s infinite; }
+.skel-img { width: 100%; height: 200px; background: linear-gradient(90deg, #f0ece4 25%, #e8e0d4 50%, #f0ece4 75%); background-size: 200% 100%; flex-shrink: 0; animation: skelShimmer 1.5s infinite; }
 .skel-body { padding: 16px; flex: 1; }
-.skel-line { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; margin-bottom: 10px; animation: skelShimmer 1.5s infinite; }
+.skel-line { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #f0ece4 25%, #e8e0d4 50%, #f0ece4 75%); background-size: 200% 100%; margin-bottom: 10px; animation: skelShimmer 1.5s infinite; }
 @keyframes skelShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ── Completion Card ── */
 .completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow: hidden; flex-shrink: 0; }
-.comp-top { padding: 20px 20px 14px; text-align: center; background: #fff; }
-.comp-badge { width: 52px; height: 52px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.comp-top { padding: 20px 20px 14px; text-align: center; background: #f7f7f5; }
+.comp-badge { width: 52px; height: 52px; border-radius: 50%; background: #6BBF4E; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .comp-badge svg { width: 26px; height: 26px; }
 .comp-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; line-height: 1.35; padding: 0 4px; }
 .comp-sub { font-size: 13px; color: #d4500a; line-height: 1.4; font-weight: 500; }
@@ -108,8 +110,10 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .comp-habit-hint { font-size: 10px; color: #999; }
 .habit-grid { display: flex; flex-direction: column; gap: 8px; }
 .habit-row { display: flex; align-items: center; gap: 8px; }
-.habit-slot-label { font-size: 11px; font-weight: 600; color: #666; width: 58px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; display: flex; align-items: center; gap: 3px; }
-.habit-dots { display: flex; gap: 5px; flex: 1; justify-content: flex-end; }
+.habit-slot-label { font-size: 11px; font-weight: 600; color: #666; width: 62px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; display: flex; align-items: center; gap: 3px; }
+.habit-slot-label .tab-icon-sm { width: 16px; height: 16px; display: inline-flex; flex-shrink: 0; }
+.habit-slot-label .tab-icon-sm svg { width: 16px; height: 16px; }
+.habit-dots { display: flex; gap: 4px; flex: 1; justify-content: flex-end; }
 .habit-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #bbb; flex-shrink: 0; background: #fafafa; }
 .habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; }
 .habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
@@ -118,7 +122,8 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .comp-timing-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
 .timing-row { display: flex; gap: 8px; }
 .timing-pill { flex: 1; padding: 10px 6px 8px; border: 1.5px solid #e8e8e8; border-radius: 10px; text-align: center; background: #fafafa; }
-.timing-pill .tp-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
+.timing-pill .tp-icon { display: flex; justify-content: center; margin-bottom: 4px; }
+.timing-pill .tp-icon svg { width: 22px; height: 22px; }
 .timing-pill .tp-name { font-size: 12px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
 .timing-pill .tp-time { font-size: 10px; color: #999; margin-top: 2px; display: block; }
 .comp-share { padding: 10px 16px 14px; background: #fff; margin-top: auto; }
@@ -142,9 +147,9 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 </div>
 
 <div class="slot-tabs">
-  <button class="slot-tab" data-slot="सुबह" onclick="switchSlot('सुबह')"><span class="tab-icon">🌅</span> सुबह<span class="fresh-dot"></span></button>
-  <button class="slot-tab active" data-slot="दोपहर" onclick="switchSlot('दोपहर')"><span class="tab-icon">☀️</span> दोपहर<span class="fresh-dot"></span></button>
-  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')"><span class="tab-icon">🌆</span> शाम<span class="fresh-dot"></span></button>
+  <button class="slot-tab" data-slot="सुबह" onclick="switchSlot('सुबह')"><span class="tab-icon" id="tabIconSubah"></span> सुबह<span class="fresh-dot"></span></button>
+  <button class="slot-tab active" data-slot="दोपहर" onclick="switchSlot('दोपहर')"><span class="tab-icon" id="tabIconDopahar"></span> दोपहर<span class="fresh-dot"></span></button>
+  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')"><span class="tab-icon" id="tabIconShaam"></span> शाम<span class="fresh-dot"></span></button>
 </div>
 
 
@@ -196,6 +201,27 @@ var TAG_COLORS = {
 };
 function getTagColor(t) { return TAG_COLORS[t] || '#D4500A'; }
 
+// ── SVG Icons (matching Figma) ──
+var SLOT_ICONS = {
+  'सुबह': '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="4" fill="#F5A623"/><path d="M12 2v3M12 17v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/><path d="M4 18h16" stroke="#E8913A" stroke-width="2" stroke-linecap="round"/><path d="M6 21h12" stroke="#D4500A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>',
+  'दोपहर': '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#F5C842"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  'शाम': '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="4.5" fill="#E8913A"/><path d="M4 17h16" stroke="#D4500A" stroke-width="2" stroke-linecap="round"/><path d="M6 20h12" stroke="#D4500A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><rect x="8" y="13" width="3" height="4" rx="0.5" fill="#D4500A" opacity="0.6"/><rect x="12" y="11" width="3" height="6" rx="0.5" fill="#D4500A" opacity="0.6"/></svg>'
+};
+
+// Small icons for habit rows and timing pills
+var SLOT_ICONS_SM = {
+  'सुबह': SLOT_ICONS['सुबह'],
+  'दोपहर': SLOT_ICONS['दोपहर'],
+  'शाम': SLOT_ICONS['शाम']
+};
+
+// Empty state illustrations (larger, with background)
+var EMPTY_STATE_ICONS = {
+  'सुबह': '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#FFF3E0"/><circle cx="32" cy="26" r="10" fill="#F5A623"/><path d="M32 8v5M32 39v5M16.6 12.6l3.5 3.5M43.9 43.9l3.5 3.5M8 28h5M51 28h5M16.6 43.4l3.5-3.5M43.9 12.1l3.5-3.5" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/><path d="M12 46h40" stroke="#E8913A" stroke-width="3" stroke-linecap="round"/><path d="M18 52h28" stroke="#D4500A" stroke-width="2" stroke-linecap="round" opacity="0.5"/></svg>',
+  'दोपहर': '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#FFF8E1"/><circle cx="32" cy="32" r="12" fill="#F5C842"/><path d="M32 8v6M32 50v6M14 14l4.2 4.2M45.8 45.8l4.2 4.2M8 32h6M50 32h6M14 50l4.2-4.2M45.8 18.2l4.2-4.2" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/></svg>',
+  'शाम': '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#FBE9E7"/><circle cx="32" cy="24" r="11" fill="#E8913A"/><path d="M10 42h44" stroke="#D4500A" stroke-width="3" stroke-linecap="round"/><path d="M16 50h32" stroke="#D4500A" stroke-width="2" stroke-linecap="round" opacity="0.5"/><rect x="20" y="32" width="7" height="10" rx="1" fill="#D4500A" opacity="0.6"/><rect x="30" y="28" width="7" height="14" rx="1" fill="#D4500A" opacity="0.6"/><rect x="40" y="34" width="5" height="8" rx="1" fill="#D4500A" opacity="0.5"/></svg>'
+};
+
 function getToday() { return now.toISOString().split('T')[0]; }
 function loadBundles() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; } }
 function getSlotBundle(slot) {
@@ -212,6 +238,12 @@ function updateSlotDots() {
   document.querySelectorAll('.slot-tab').forEach(function(t) {
     t.classList.toggle('has-fresh', todaySlots.indexOf(t.dataset.slot) !== -1 && visited.indexOf(t.dataset.slot) === -1);
   });
+}
+
+function initTabIcons() {
+  document.getElementById('tabIconSubah').innerHTML = SLOT_ICONS['सुबह'];
+  document.getElementById('tabIconDopahar').innerHTML = SLOT_ICONS['दोपहर'];
+  document.getElementById('tabIconShaam').innerHTML = SLOT_ICONS['शाम'];
 }
 
 function switchSlot(slot) {
@@ -269,7 +301,7 @@ function renderCards() {
   if (!bundle || !bundle.stories || !bundle.stories.length) {
     var times = { 'सुबह': 'सुबह 7:00 बजे मिलेंगी आज की', 'दोपहर': 'दोपहर 2:00 बजे मिलेंगी आज की', 'शाम': 'शाम 7:00 बजे मिलेंगी आज की' };
     var names = { 'सुबह': 'सुबह की खबरें आ रही हैं', 'दोपहर': 'दोपहर की खबरें आ रही हैं', 'शाम': 'शाम की खबरें आ रही हैं' };
-    track.innerHTML = '<div class="state-screen"><div class="state-icon">📰</div><div class="state-title">' + names[currentSlot] + '</div><div class="state-sub">' + times[currentSlot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
+    track.innerHTML = '<div class="state-screen"><div class="state-icon">' + EMPTY_STATE_ICONS[currentSlot] + '</div><div class="state-title">' + names[currentSlot] + '</div><div class="state-sub">' + times[currentSlot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
     footer.style.display = 'none';
     updateCounter(0,0); updateProgress(0,0);
     return;
@@ -326,7 +358,6 @@ function buildCompletionCard() {
   var all = loadBundles().filter(function(b) { return b.date === today; });
   var publishedSlots = all.map(function(b) { return b.slot; });
   var allSlots = ['सुबह', 'दोपहर', 'शाम'];
-  var slotEmojis = { 'सुबह': '🌅', 'दोपहर': '☀️', 'शाम': '🌆' };
   var slotTimes = { 'सुबह': '7:00 AM पर', 'दोपहर': '2:00 PM पर', 'शाम': '7:00 PM पर' };
   var nextSlotTimes = { 'सुबह': '7:00AM', 'दोपहर': '2:00PM', 'शाम': '7:00PM' };
 
@@ -340,40 +371,41 @@ function buildCompletionCard() {
     nextSlotText = 'कल सुबह ' + nextSlotTimes['सुबह'] + ' पर मिलते हैं!';
   }
 
-  // Reading streak — English day labels (M, T, W, T, F, S, S)
+  // Reading streak — 7 days (Mon to Sun), matching Figma
   var habitHtml = '';
   var engDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  // Get day of week for 6 days ago to figure out labels
+  // Find last Monday to show a full Mon-Sun week
+  var todayDow = now.getDay(); // 0=Sun
+  var mondayOffset = todayDow === 0 ? 6 : todayDow - 1; // days since Monday
+
   for (var si = 0; si < allSlots.length; si++) {
     var slot = allSlots[si];
     var dotsHtml = '';
-    for (var d = 5; d >= 0; d--) {
-      var dt = new Date(now.getTime() - d * 86400000);
+    for (var d = 0; d < 7; d++) {
+      var dt = new Date(now.getTime() - (mondayOffset - d) * 86400000);
       var dtStr = dt.toISOString().split('T')[0];
-      var dayOfWeek = dt.getDay(); // 0=Sun
-      var dayLabel = engDays[dayOfWeek === 0 ? 6 : dayOfWeek - 1]; // Mon-based
+      var dayLabel = engDays[d];
       var bundles = loadBundles().filter(function(b) { return b.date === dtStr && b.slot === slot; });
       var isToday = (dtStr === today);
-      var isDone = bundles.length > 0 && (d > 0 || publishedSlots.indexOf(slot) !== -1);
+      var isDone = bundles.length > 0 && (!isToday || publishedSlots.indexOf(slot) !== -1);
       var isCurrent = isToday && slot === currentSlot;
 
       if (isCurrent || isDone) {
         dotsHtml += '<div class="habit-dot done">✓</div>';
       } else if (isToday) {
-        // Today but not done for this slot — show dash in orange outline
         dotsHtml += '<div class="habit-dot missed">-</div>';
       } else {
         dotsHtml += '<div class="habit-dot">' + dayLabel + '</div>';
       }
     }
-    habitHtml += '<div class="habit-row"><div class="habit-slot-label">' + slotEmojis[slot] + ' ' + slot + '</div><div class="habit-dots">' + dotsHtml + '</div></div>';
+    habitHtml += '<div class="habit-row"><div class="habit-slot-label"><span class="tab-icon-sm">' + SLOT_ICONS_SM[slot] + '</span> ' + slot + '</div><div class="habit-dots">' + dotsHtml + '</div></div>';
   }
 
-  // Timings section
+  // Timings section with SVG icons
   var timingHtml = '';
   for (var ti = 0; ti < allSlots.length; ti++) {
     var ts = allSlots[ti];
-    timingHtml += '<div class="timing-pill"><span class="tp-emoji">' + slotEmojis[ts] + '</span><span class="tp-name">' + ts + '</span><span class="tp-time">' + slotTimes[ts] + '</span></div>';
+    timingHtml += '<div class="timing-pill"><div class="tp-icon">' + SLOT_ICONS_SM[ts] + '</div><span class="tp-name">' + ts + '</span><span class="tp-time">' + slotTimes[ts] + '</span></div>';
   }
 
   // Green checkmark SVG
@@ -474,6 +506,7 @@ window.addEventListener('storage', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+  initTabIcons();
   var dateStr = '(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')';
   var dateEl = document.getElementById('topbarDate');
   if (dateEl) dateEl.textContent = dateStr;
