@@ -4,102 +4,130 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>एक नज़र</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* ── Reset ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f0ece4; height: 100vh; overflow: hidden; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
-.topbar { background: #fff; padding: 12px 16px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8e0d4; flex-shrink: 0; }
-.back-btn { width: 32px; height: 32px; background: #f5f0e8; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #1a1208; font-size: 15px; border: 1px solid #e0d4c0; flex-shrink: 0; }
-.topbar-center { flex: 1; padding: 0 12px; }
-.topbar-title { font-size: 17px; font-weight: 600; color: #1a1208; line-height: 1.2; }
-.topbar-title span { color: #d4500a; }
-.topbar-sub { font-size: 11px; color: #7a6a52; margin-top: 2px; }
-.card-counter { font-size: 12px; font-weight: 600; color: #7a6a52; flex-shrink: 0; }
-.card-counter strong { color: #1a1208; }
-.slot-tabs { background: #fff; display: flex; border-bottom: 1px solid #e8e0d4; flex-shrink: 0; padding: 6px 12px; gap: 6px; }
-.slot-tab { flex: 1; padding: 6px 4px; font-size: 13px; font-weight: 600; color: #7a6a52; cursor: pointer; border: none; background: none; font-family: 'Noto Sans Devanagari', sans-serif; border-radius: 20px; transition: all 0.2s; text-align: center; position: relative; }
-.slot-tab.active { color: #d4500a; background: rgba(212,80,10,0.1); }
-.fresh-dot { display: none; position: absolute; top: 4px; right: 10px; width: 7px; height: 7px; background: #d4500a; border-radius: 50%; border: 1.5px solid #fff; }
+body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+
+/* ── Topbar ── */
+.topbar { background: #fff; padding: 14px 16px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
+.back-btn { width: 34px; height: 34px; background: none; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #1a1a1a; font-size: 18px; flex-shrink: 0; cursor: pointer; }
+.back-btn:active { background: #f5f5f5; }
+.topbar-center { flex: 1; }
+.topbar-title { font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.3; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.topbar-title .brand { color: #d4500a; font-weight: 700; }
+.topbar-title .date { color: #999; font-weight: 400; font-size: 13px; }
+.card-counter { width: 40px; height: 28px; background: #d4500a; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; letter-spacing: -0.3px; }
+
+/* ── Slot Tabs ── */
+.slot-tabs { background: #fff; display: flex; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; padding: 0; }
+.slot-tab { flex: 1; padding: 10px 4px 8px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; border: none; background: none; font-family: 'Noto Sans Devanagari', sans-serif; transition: all 0.2s; text-align: center; position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.slot-tab::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2.5px; background: transparent; border-radius: 2px; transition: all 0.2s; }
+.slot-tab.active { color: #d4500a; }
+.slot-tab.active::after { background: #d4500a; }
+.slot-tab .tab-icon { font-size: 14px; }
+.fresh-dot { display: none; width: 6px; height: 6px; background: #d4500a; border-radius: 50%; flex-shrink: 0; }
 .slot-tab.has-fresh .fresh-dot { display: block; }
 .slot-tab.active .fresh-dot { display: none; }
-.progress-wrap { height: 3px; background: #e8e0d4; flex-shrink: 0; }
-.progress-bar { height: 100%; background: #d4500a; transition: width 0.3s ease; }
+
+/* ── Progress ── */
+.progress-wrap { height: 2.5px; background: #f0f0f0; flex-shrink: 0; }
+.progress-bar { height: 100%; background: #d4500a; transition: width 0.3s ease; border-radius: 0 2px 2px 0; }
+
+/* ── Card viewport ── */
 .card-viewport { flex: 1; overflow: hidden; position: relative; }
 .card-track { display: flex; height: 100%; transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94); will-change: transform; }
+
+/* ── News Card ── */
 .news-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow: hidden; flex-shrink: 0; }
-.card-image { width: 100%; height: 170px; background: #e8e0d4; flex-shrink: 0; overflow: hidden; position: relative; }
+.card-image { width: 100%; height: 200px; background: #e8e8e8; flex-shrink: 0; overflow: hidden; position: relative; }
 .card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.card-image-placeholder { font-size: 36px; opacity: 0.25; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.card-tag { position: absolute; bottom: 10px; left: 12px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.04em; background: #D4500A; padding: 3px 9px; border-radius: 12px; z-index: 2; }
-.video-thumb { width: 100%; height: 100%; background: #111; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
-.video-thumb-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); }
-.play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 52px; height: 52px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.85); z-index: 3; }
-.play-btn::after { content: ''; display: block; width: 0; height: 0; border-style: solid; border-width: 9px 0 9px 18px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
+.card-image-placeholder { font-size: 40px; opacity: 0.2; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f0ece4 0%, #e8e0d4 100%); }
+.card-tag { position: absolute; bottom: 12px; left: 14px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.02em; background: #D4500A; padding: 4px 12px; border-radius: 4px; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+
+/* ── Video ── */
+.video-thumb { width: 100%; height: 100%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+.video-thumb-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.25); }
+.play-btn { width: 56px; height: 56px; background: rgba(0,0,0,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid rgba(255,255,255,0.9); z-index: 3; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.play-btn::after { content: ''; display: block; width: 0; height: 0; border-style: solid; border-width: 10px 0 10px 20px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
 .video-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; align-items: center; justify-content: center; }
 .video-overlay.open { display: flex; }
 .video-overlay video { width: 100%; max-height: 100vh; object-fit: contain; }
-.video-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.5); border-radius: 50%; color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
-.card-body { flex: 1; padding: 12px 16px 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.card-headline { font-size: 16px; font-weight: 600; line-height: 1.45; color: #1a1208; margin-bottom: 10px; }
-.card-divider { height: 1px; background: #e8e0d4; margin-bottom: 12px; }
-.card-bullets { display: flex; flex-direction: column; gap: 10px; padding-bottom: 14px; }
-.bullet-item { display: flex; align-items: flex-start; gap: 8px; }
-.bullet-dot { color: #d4500a; font-size: 16px; line-height: 1.6; flex-shrink: 0; }
-.bullet-text { font-size: 14px; font-weight: 400; line-height: 1.6; color: #3a2e20; }
-.bullet-text strong { font-weight: 700; color: #1a1208; }
-.card-footer { background: #fff; padding: 8px 16px 10px; border-top: 1px solid #e8e0d4; flex-shrink: 0; }
-.read-more-btn { display: block; width: 100%; padding: 10px; background: rgba(212,80,10,0.07); border: 1px solid rgba(212,80,10,0.2); border-radius: 8px; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 15px; text-align: center; text-decoration: none; cursor: pointer; }
-.read-more-btn:active { background: rgba(212,80,10,0.14); }
+.video-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.4); border-radius: 50%; color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+
+/* ── Card Body ── */
+.card-body { flex: 1; padding: 14px 16px 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.card-headline { font-size: 17px; font-weight: 700; line-height: 1.5; color: #1a1a1a; margin-bottom: 12px; }
+.card-divider { height: 1px; background: #f0f0f0; margin-bottom: 14px; }
+.card-bullets { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
+.bullet-item { display: flex; align-items: flex-start; gap: 10px; }
+.bullet-dot { color: #1a1a1a; font-size: 6px; line-height: 1.7; flex-shrink: 0; margin-top: 7px; width: 6px; height: 6px; background: #1a1a1a; border-radius: 50; display: block; }
+.bullet-text { font-size: 14.5px; font-weight: 400; line-height: 1.65; color: #333; }
+.bullet-text strong, .bullet-text b { font-weight: 700; color: #1a1a1a; }
+
+/* ── Footer ── */
+.card-footer { background: #fff; padding: 10px 16px 12px; border-top: 1px solid #f0f0f0; flex-shrink: 0; }
+.read-more-btn { display: block; width: 100%; padding: 12px; background: #d4500a; border: none; border-radius: 10px; color: #fff; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 15px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; letter-spacing: 0.01em; }
+.read-more-btn:active { background: #b8440a; }
+.read-more-btn.disabled { background: #ccc; pointer-events: none; }
+
+/* ── Desktop Nav ── */
 .desktop-nav { display: none; }
 @media (hover: hover) and (pointer: fine) {
-  .desktop-nav { display: flex; justify-content: space-between; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); pointer-events: none; padding: 0 8px; z-index: 10; }
-  .desktop-nav-btn { pointer-events: all; width: 36px; height: 36px; background: rgba(255,255,255,0.92); border: 1px solid #e0d4c0; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); color: #1a1208; }
-  .desktop-nav-btn:hover { background: #fff; }
-  .desktop-nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .desktop-nav { display: flex; justify-content: space-between; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); pointer-events: none; padding: 0 6px; z-index: 10; }
+  .desktop-nav-btn { pointer-events: all; width: 36px; height: 36px; background: rgba(255,255,255,0.95); border: 1px solid #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: #1a1a1a; }
+  .desktop-nav-btn:hover { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  .desktop-nav-btn:disabled { opacity: 0.2; cursor: default; }
 }
-.state-screen { min-width: 100%; min-height: 300px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; background: #fff; gap: 14px; }
-.state-icon { font-size: 44px; opacity: 0.25; }
-.state-title { font-size: 20px; font-weight: 600; color: #1a1208; }
-.state-sub { font-size: 13px; color: #7a6a52; line-height: 1.6; }
-.anim-bar { width: 60px; height: 3px; background: #e8e0d4; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+
+/* ── Empty / Waiting State ── */
+.state-screen { min-width: 100%; min-height: 300px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; background: #fff; gap: 10px; }
+.state-icon { width: 72px; height: 72px; background: rgba(212,80,10,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 6px; }
+.state-title { font-size: 18px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
+.state-sub { font-size: 13px; color: #999; line-height: 1.5; }
+.anim-bar { width: 48px; height: 3px; background: #f0f0f0; border-radius: 2px; overflow: hidden; margin-top: 10px; }
 .anim-fill { height: 100%; background: #d4500a; animation: fill 1.8s ease-in-out infinite alternate; }
 @keyframes fill { from { width: 10%; } to { width: 90%; } }
-/* ── Completion card ── */
-.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow-y: auto; flex-shrink: 0; }
-.comp-top { padding: 24px 20px 16px; text-align: center; flex-shrink: 0; }
-.comp-badge { width: 56px; height: 56px; border-radius: 50%; background: rgba(212,80,10,0.1); border: 2px solid rgba(212,80,10,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; }
-.comp-title { font-size: 18px; font-weight: 700; color: #1a1208; margin-bottom: 6px; line-height: 1.3; }
-.comp-sub { font-size: 13px; color: #7a6a52; line-height: 1.5; }
-.comp-divider { height: 1px; background: #e8e0d4; margin: 0 20px; }
-.comp-habit { padding: 16px 20px; flex-shrink: 0; }
-.comp-habit-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6a52; margin-bottom: 12px; }
-.habit-grid { display: flex; flex-direction: column; gap: 8px; }
-.habit-row { display: flex; align-items: center; gap: 8px; }
-.habit-slot-label { font-size: 11px; font-weight: 600; color: #7a6a52; width: 52px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; }
-.habit-dots { display: flex; gap: 5px; flex: 1; }
-.habit-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #e8e0d4; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #b0a090; flex-shrink: 0; background: #faf7f2; }
-.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 11px; }
-.habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
-.comp-next { padding: 12px 20px; flex-shrink: 0; }
-.comp-next-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6a52; margin-bottom: 10px; }
-.next-slot-row { display: flex; gap: 8px; }
-.next-slot-pill { flex: 1; padding: 10px 8px; border: 1.5px solid #e8e0d4; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; background: #faf7f2; }
-.next-slot-pill.available { border-color: rgba(212,80,10,0.3); background: rgba(212,80,10,0.05); }
-.next-slot-pill.active-now { border-color: #d4500a; background: rgba(212,80,10,0.08); }
-.next-slot-pill .nsp-emoji { font-size: 16px; display: block; margin-bottom: 3px; }
-.next-slot-pill .nsp-name { font-size: 11px; font-weight: 600; color: #1a1208; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
-.next-slot-pill .nsp-status { font-size: 9px; color: #7a6a52; margin-top: 2px; display: block; }
-.next-slot-pill.available .nsp-status { color: #d4500a; }
-.comp-share { padding: 12px 20px 20px; flex-shrink: 0; }
-.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1.5px solid #e8e0d4; border-radius: 10px; background: none; color: #7a6a52; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.share-btn:active { border-color: #d4500a; color: #d4500a; background: rgba(212,80,10,0.05); }
 
+/* ── Skeleton Loading ── */
 .skel-card { min-width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; }
-.skel-img { width: 100%; height: 170px; background: #ede8e0; flex-shrink: 0; animation: shimmer 1.5s infinite; }
+.skel-img { width: 100%; height: 200px; background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; flex-shrink: 0; animation: skelShimmer 1.5s infinite; }
 .skel-body { padding: 16px; flex: 1; }
-.skel-line { height: 13px; border-radius: 4px; background: #ede8e0; margin-bottom: 10px; animation: shimmer 1.5s infinite; }
-@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
-.update-toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #1a1208; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+.skel-line { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; margin-bottom: 10px; animation: skelShimmer 1.5s infinite; }
+@keyframes skelShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── Completion Card ── */
+.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow-y: auto; flex-shrink: 0; }
+.comp-top { padding: 28px 20px 20px; text-align: center; flex-shrink: 0; }
+.comp-badge { width: 60px; height: 60px; border-radius: 50%; background: rgba(212,80,10,0.1); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
+.comp-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; line-height: 1.3; }
+.comp-sub { font-size: 13px; color: #999; line-height: 1.5; }
+.comp-divider { height: 1px; background: #f0f0f0; margin: 0 20px; }
+.comp-habit { padding: 18px 20px; flex-shrink: 0; }
+.comp-habit-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #999; margin-bottom: 14px; }
+.habit-grid { display: flex; flex-direction: column; gap: 10px; }
+.habit-row { display: flex; align-items: center; gap: 10px; }
+.habit-slot-label { font-size: 11px; font-weight: 600; color: #999; width: 54px; flex-shrink: 0; font-family: 'Noto Sans Devanagari', sans-serif; }
+.habit-dots { display: flex; gap: 6px; flex: 1; }
+.habit-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #ccc; flex-shrink: 0; background: #fafafa; }
+.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; }
+.habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
+.comp-next { padding: 14px 20px; flex-shrink: 0; }
+.comp-next-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #999; margin-bottom: 12px; }
+.next-slot-row { display: flex; gap: 10px; }
+.next-slot-pill { flex: 1; padding: 12px 8px; border: 1.5px solid #e8e8e8; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+.next-slot-pill.available { border-color: rgba(212,80,10,0.3); background: rgba(212,80,10,0.04); }
+.next-slot-pill .nsp-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
+.next-slot-pill .nsp-name { font-size: 12px; font-weight: 600; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
+.next-slot-pill .nsp-status { font-size: 9px; color: #999; margin-top: 3px; display: block; }
+.next-slot-pill.available .nsp-status { color: #d4500a; }
+.comp-share { padding: 14px 20px 24px; flex-shrink: 0; }
+.share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border: 1.5px solid #e8e8e8; border-radius: 12px; background: none; color: #666; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.share-btn:active { border-color: #d4500a; color: #d4500a; background: rgba(212,80,10,0.04); }
+
+/* ── Toast ── */
+.update-toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 18px; border-radius: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
 .update-toast.show { opacity: 1; }
 .toast-dot { width: 6px; height: 6px; background: #d4500a; border-radius: 50%; }
 </style>
@@ -109,16 +137,15 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f0ece4; hei
 <div class="topbar">
   <a class="back-btn" href="ek-nazar-landing.html">←</a>
   <div class="topbar-center">
-    <div class="topbar-title" id="topbarTitle">दोपहर की <span>एक नज़र</span></div>
-    <div class="topbar-sub" id="topbarSub"></div>
+    <div class="topbar-title" id="topbarTitle">दोपहर की <span class="brand">एक नज़र</span> <span class="date" id="topbarDate"></span></div>
   </div>
-  <div class="card-counter"><strong id="curNum">—</strong> / <span id="totNum">—</span></div>
+  <div class="card-counter" id="cardCounter">—</div>
 </div>
 
 <div class="slot-tabs">
-  <button class="slot-tab" data-slot="सुबह" onclick="switchSlot('सुबह')">🌅 सुबह<span class="fresh-dot"></span></button>
-  <button class="slot-tab active" data-slot="दोपहर" onclick="switchSlot('दोपहर')">☀️ दोपहर<span class="fresh-dot"></span></button>
-  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')">🌆 शाम<span class="fresh-dot"></span></button>
+  <button class="slot-tab" data-slot="सुबह" onclick="switchSlot('सुबह')"><span class="tab-icon">🌅</span> सुबह<span class="fresh-dot"></span></button>
+  <button class="slot-tab active" data-slot="दोपहर" onclick="switchSlot('दोपहर')"><span class="tab-icon">☀️</span> दोपहर<span class="fresh-dot"></span></button>
+  <button class="slot-tab" data-slot="शाम" onclick="switchSlot('शाम')"><span class="tab-icon">🌆</span> शाम<span class="fresh-dot"></span></button>
 </div>
 
 <div class="progress-wrap">
@@ -130,12 +157,12 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f0ece4; hei
     <div class="skel-card">
       <div class="skel-img"></div>
       <div class="skel-body">
-        <div class="skel-line" style="width:35%;height:11px;margin-bottom:12px"></div>
-        <div class="skel-line" style="width:100%;height:20px;margin-bottom:6px"></div>
-        <div class="skel-line" style="width:75%;height:20px;margin-bottom:18px"></div>
+        <div class="skel-line" style="width:30%;height:10px;margin-bottom:14px"></div>
+        <div class="skel-line" style="width:100%;height:18px;margin-bottom:6px"></div>
+        <div class="skel-line" style="width:70%;height:18px;margin-bottom:20px"></div>
         <div class="skel-line" style="width:100%"></div>
-        <div class="skel-line" style="width:90%"></div>
-        <div class="skel-line" style="width:65%"></div>
+        <div class="skel-line" style="width:92%"></div>
+        <div class="skel-line" style="width:60%"></div>
       </div>
     </div>
   </div>
@@ -163,6 +190,16 @@ var currentIdx = 0;
 var cards = [];
 var now = new Date();
 
+var TAG_COLORS = {
+  'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
+  'स्पोर्ट्स':'#0F86F5','बिजनेस':'#3E9E3E','बॉलीवुड':'#9D46F3',
+  'लाइफस्टाइल':'#ECAF00','जीवन मंत्र':'#DB6533','देश':'#83B82E',
+  'विदेश':'#39C3A2','टेक - ऑटो':'#4766D2','यूटिलिटी':'#879DE9',
+  'जॉब - एजुकेशन':'#22B6E4','क्राइम':'#FF554B','हेल्थ':'#39C3A2',
+  'एजुकेशन':'#22B6E4','टेक्नोलॉजी':'#4766D2'
+};
+function getTagColor(t) { return TAG_COLORS[t] || '#D4500A'; }
+
 function getToday() { return now.toISOString().split('T')[0]; }
 function loadBundles() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; } }
 function getSlotBundle(slot) {
@@ -187,7 +224,7 @@ function switchSlot(slot) {
   currentIdx = 0;
   document.querySelectorAll('.slot-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.slot === slot); });
   var titles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
-  document.getElementById('topbarTitle').innerHTML = titles[slot] + ' <span>एक नज़र</span>';
+  document.getElementById('topbarTitle').innerHTML = titles[slot] + ' <span class="brand">एक नज़र</span> <span class="date" id="topbarDate">(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')</span>';
   updateSlotDots();
   renderCards();
 }
@@ -217,9 +254,7 @@ function parseBullets(html) {
 function openVideo(url) {
   var ov = document.getElementById('videoOverlay');
   var vid = document.getElementById('overlayVideo');
-  vid.src = url;
-  vid.load();
-  vid.play();
+  vid.src = url; vid.load(); vid.play();
   ov.classList.add('open');
 }
 function closeVideo() {
@@ -236,9 +271,9 @@ function renderCards() {
   var footer = document.getElementById('cardFooter');
 
   if (!bundle || !bundle.stories || !bundle.stories.length) {
-    var times = { 'सुबह': 'सुबह 7:00 बजे', 'दोपहर': 'दोपहर 2:00 बजे', 'शाम': 'शाम 7:00 बजे' };
-    var names = { 'सुबह': 'सुबह की एक नज़र', 'दोपहर': 'दोपहर की एक नज़र', 'शाम': 'शाम की एक नज़र' };
-    track.innerHTML = '<div class="state-screen"><div class="state-icon">📰</div><div class="state-title">' + names[currentSlot] + '</div><div class="state-sub">' + times[currentSlot] + ' तक आएगी</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
+    var times = { 'सुबह': 'सुबह 7:00 बजे मिलेंगी आज की', 'दोपहर': 'दोपहर 2:00 बजे मिलेंगी आज की', 'शाम': 'शाम 7:00 बजे मिलेंगी आज की' };
+    var names = { 'सुबह': 'सुबह की खबरें आ रही हैं', 'दोपहर': 'दोपहर की खबरें आ रही हैं', 'शाम': 'शाम की खबरें आ रही हैं' };
+    track.innerHTML = '<div class="state-screen"><div class="state-icon">📰</div><div class="state-title">' + names[currentSlot] + '</div><div class="state-sub">' + times[currentSlot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
     footer.style.display = 'none';
     updateCounter(0,0); updateProgress(0,0);
     return;
@@ -247,20 +282,12 @@ function renderCards() {
   cards = bundle.stories;
   footer.style.display = 'block';
 
-  var TAG_COLORS = {
-    'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
-    'स्पोर्ट्स':'#0F86F5','बिजनेस':'#3E9E3E','बॉलीवुड':'#9D46F3',
-    'लाइफस्टाइल':'#ECAF00','देश':'#83B82E','विदेश':'#39C3A2',
-    'टेक - ऑटो':'#4766D2','यूटिलिटी':'#879DE9'
-  };
-  function getTagColor(t) { return TAG_COLORS[t] || '#D4500A'; }
-
   var html = '';
   for (var i = 0; i < cards.length; i++) {
     var s = cards[i];
     var tag = s.tag || '';
     var tagBg = getTagColor(tag);
-    // New format: imageUrl + videoUrl; backward compat with old mediaType/mediaUrl
+    // Backward compat with old mediaType/mediaUrl
     var imageUrl = s.imageUrl || '';
     var videoUrl = s.videoUrl || '';
     if (!imageUrl && !videoUrl && s.mediaUrl) {
@@ -269,7 +296,6 @@ function renderCards() {
     }
     var mediaHtml = '';
     var safeTag = tag.replace(/'/g,"\\'");
-
     var tagSpan = '<span class="card-tag" style="background:' + tagBg + '">' + tag + '</span>';
     var safeTagSpan = '<span class=card-tag style=background:' + tagBg + '>' + safeTag + '</span>';
 
@@ -288,13 +314,12 @@ function renderCards() {
     var bullets = parseBullets(s.summary);
     var bh = '';
     for (var j = 0; j < bullets.length; j++) {
-      bh += '<div class="bullet-item"><div class="bullet-dot">•</div><div class="bullet-text">' + bullets[j] + '</div></div>';
+      bh += '<div class="bullet-item"><div class="bullet-dot"></div><div class="bullet-text">' + bullets[j] + '</div></div>';
     }
-    if (!bh) bh = '<div class="bullet-text">—</div>';
+    if (!bh) bh = '<div class="bullet-text" style="color:#999;">—</div>';
 
     html += '<div class="news-card">' + mediaHtml + '<div class="card-body"><div class="card-headline">' + (s.headline||'') + '</div><div class="card-divider"></div><div class="card-bullets">' + bh + '</div></div></div>';
   }
-  // Append completion card
   html += buildCompletionCard();
   track.innerHTML = html;
   goTo(0, false);
@@ -308,7 +333,6 @@ function buildCompletionCard() {
   var slotEmojis = { 'सुबह': '🌅', 'दोपहर': '☀️', 'शाम': '🌆' };
   var slotTimes = { 'सुबह': '7:00 AM', 'दोपहर': '2:00 PM', 'शाम': '7:00 PM' };
 
-  // Build 7-day habit grid
   var habitHtml = '';
   var dayLabels = ['सो', 'म', 'म', 'ब', 'ग', 'शु', 'श'];
   for (var si = 0; si < allSlots.length; si++) {
@@ -328,7 +352,6 @@ function buildCompletionCard() {
     habitHtml += '<div class="habit-row"><div class="habit-slot-label">' + slotEmojis[slot] + ' ' + slot + '</div><div class="habit-dots">' + dotsHtml + '</div></div>';
   }
 
-  // Next slots
   var nextHtml = '';
   for (var ni = 0; ni < allSlots.length; ni++) {
     var ns = allSlots[ni];
@@ -378,7 +401,6 @@ function shareBundle() {
 function goTo(idx, animate) {
   if (typeof animate === 'undefined') animate = true;
   if (!cards.length) return;
-  // cards.length is the completion card index
   idx = Math.max(0, Math.min(idx, cards.length));
   currentIdx = idx;
   var track = document.getElementById('cardTrack');
@@ -398,8 +420,9 @@ function goTo(idx, animate) {
     var s = cards[idx];
     if (s) {
       var btn = document.getElementById('readMoreBtn');
-      btn.href = s.deepLink || s.articleUrl || '#';
-      btn.style.opacity = (s.deepLink || s.articleUrl) ? '1' : '0.4';
+      var hasLink = s.deepLink || s.articleUrl;
+      btn.href = hasLink || '#';
+      btn.className = 'read-more-btn' + (hasLink ? '' : ' disabled');
     }
   }
   var pb = document.getElementById('prevBtn'); var nb = document.getElementById('nextBtn');
@@ -407,9 +430,12 @@ function goTo(idx, animate) {
   if (nb) nb.disabled = isCompletion;
 }
 
-function updateCounter(c,t) { document.getElementById('curNum').textContent = c||'—'; document.getElementById('totNum').textContent = t||'—'; }
+function updateCounter(c,t) {
+  document.getElementById('cardCounter').textContent = t > 0 ? c + '/' + t : '—';
+}
 function updateProgress(c,t) { document.getElementById('progressBar').style.width = t > 0 ? ((c/t)*100)+'%' : '0%'; }
 
+// ── Swipe / Drag ──
 var txS=0, tyS=0, drag=false;
 var vp = document.getElementById('cardViewport');
 vp.addEventListener('touchstart', function(e) { txS=e.touches[0].clientX; tyS=e.touches[0].clientY; }, {passive:true});
@@ -432,7 +458,9 @@ window.addEventListener('storage', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('topbarSub').textContent = now.toLocaleDateString('hi-IN', {day:'numeric',month:'long'});
+  var dateStr = '(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')';
+  var dateEl = document.getElementById('topbarDate');
+  if (dateEl) dateEl.textContent = dateStr;
   var hr = now.getHours();
   switchSlot(hr < 12 ? 'सुबह' : (hr < 17 ? 'दोपहर' : 'शाम'));
 });
