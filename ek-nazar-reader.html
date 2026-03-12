@@ -30,7 +30,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f0ece4; hei
 .card-image { width: 100%; height: 170px; background: #e8e0d4; flex-shrink: 0; overflow: hidden; position: relative; }
 .card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .card-image-placeholder { font-size: 36px; opacity: 0.25; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.card-tag { position: absolute; bottom: 10px; left: 12px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.04em; background: rgba(212,80,10,0.88); padding: 3px 9px; border-radius: 12px; z-index: 2; }
+.card-tag { position: absolute; bottom: 10px; left: 12px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.04em; background: #D4500A; padding: 3px 9px; border-radius: 12px; z-index: 2; }
 .video-thumb { width: 100%; height: 100%; background: #111; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
 .video-thumb-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); }
 .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 52px; height: 52px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.85); z-index: 3; }
@@ -247,10 +247,19 @@ function renderCards() {
   cards = bundle.stories;
   footer.style.display = 'block';
 
+  var TAG_COLORS = {
+    'बीकानेर':'#554BDB','राजस्थान':'#554BDB','स्पोर्ट्स':'#0F86F5','बॉलीवुड':'#9D46F3',
+    'जॉब - एजुकेशन':'#22B6E4','एजुकेशन':'#22B6E4','बिजनेस':'#3E9E3E','लाइफस्टाइल':'#ECAF00',
+    'जीवन मंत्र':'#DB6533','देश':'#83B82E','विदेश':'#39C3A2','टेक - ऑटो':'#4766D2',
+    'टेक्नोलॉजी':'#4766D2','यूटिलिटी':'#879DE9','क्राइम':'#FF554B','हेल्थ':'#22B6E4'
+  };
+  function getTagColor(t) { return TAG_COLORS[t] || '#D4500A'; }
+
   var html = '';
   for (var i = 0; i < cards.length; i++) {
     var s = cards[i];
     var tag = s.tag || '';
+    var tagBg = getTagColor(tag);
     // New format: imageUrl + videoUrl; backward compat with old mediaType/mediaUrl
     var imageUrl = s.imageUrl || '';
     var videoUrl = s.videoUrl || '';
@@ -261,17 +270,19 @@ function renderCards() {
     var mediaHtml = '';
     var safeTag = tag.replace(/'/g,"\\'");
 
+    var tagSpan = '<span class="card-tag" style="background:' + tagBg + '">' + tag + '</span>';
+    var safeTagSpan = '<span class=card-tag style=background:' + tagBg + '>' + safeTag + '</span>';
+
     if (imageUrl && videoUrl) {
-      // OG image thumbnail + play button overlay for video
       var safeVidUrl = videoUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      mediaHtml = '<div class="card-image"><span class="card-tag">' + tag + '</span><img src="' + imageUrl + '" alt="" onerror="this.style.display=\'none\'"><div class="video-thumb-overlay" onclick="openVideo(\'' + safeVidUrl + '\')"><div class="play-btn"></div></div></div>';
+      mediaHtml = '<div class="card-image">' + tagSpan + '<img src="' + imageUrl + '" alt="" onerror="this.style.display=\'none\'"><div class="video-thumb-overlay" onclick="openVideo(\'' + safeVidUrl + '\')"><div class="play-btn"></div></div></div>';
     } else if (imageUrl) {
-      mediaHtml = '<div class="card-image"><span class="card-tag">' + tag + '</span><img src="' + imageUrl + '" alt="" onerror="this.parentNode.innerHTML=\'<span class=card-tag>' + safeTag + '</span><div class=card-image-placeholder>📰</div>\'"></div>';
+      mediaHtml = '<div class="card-image">' + tagSpan + '<img src="' + imageUrl + '" alt="" onerror="this.parentNode.innerHTML=\'' + safeTagSpan + '<div class=card-image-placeholder>📰</div>\'"></div>';
     } else if (videoUrl) {
       var safeUrl = videoUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      mediaHtml = '<div class="card-image"><span class="card-tag">' + tag + '</span><div class="video-thumb" onclick="openVideo(\'' + safeUrl + '\')"><div class="play-btn"></div></div></div>';
+      mediaHtml = '<div class="card-image">' + tagSpan + '<div class="video-thumb" onclick="openVideo(\'' + safeUrl + '\')"><div class="play-btn"></div></div></div>';
     } else {
-      mediaHtml = '<div class="card-image"><span class="card-tag">' + tag + '</span><div class="card-image-placeholder">📰</div></div>';
+      mediaHtml = '<div class="card-image">' + tagSpan + '<div class="card-image-placeholder">📰</div></div>';
     }
 
     var bullets = parseBullets(s.summary);

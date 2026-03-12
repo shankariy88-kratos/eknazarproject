@@ -536,6 +536,14 @@
   let jsonVisible = false;
   const STORAGE_KEY = 'ek_nazar_bundles';
 
+  const TAG_COLORS = {
+    'बीकानेर':'#554BDB','राजस्थान':'#554BDB','स्पोर्ट्स':'#0F86F5','बॉलीवुड':'#9D46F3',
+    'जॉब - एजुकेशन':'#22B6E4','एजुकेशन':'#22B6E4','बिजनेस':'#3E9E3E','लाइफस्टाइल':'#ECAF00',
+    'जीवन मंत्र':'#DB6533','देश':'#83B82E','विदेश':'#39C3A2','टेक - ऑटो':'#4766D2',
+    'टेक्नोलॉजी':'#4766D2','यूटिलिटी':'#879DE9','क्राइम':'#FF554B','हेल्थ':'#22B6E4'
+  };
+  function getTagColor(t) { return TAG_COLORS[t] || '#888'; }
+
   // Modal context
   let modalCtx = null;
   // { mode: 'live-edit', storyId }
@@ -555,7 +563,7 @@
   }
 
   // ── Tag ──
-  const DEFAULT_TAGS = ['बीकानेर','राजस्थान','देश','विदेश','बिजनेस','स्पोर्ट्स','बॉलीवुड','लाइफस्टाइल'];
+  const DEFAULT_TAGS = ['बीकानेर','राजस्थान','देश','विदेश','बिजनेस','स्पोर्ट्स','बॉलीवुड','लाइफस्टाइल','जीवन मंत्र','जॉब - एजुकेशन','टेक - ऑटो','यूटिलिटी'];
   const TAGS_KEY = 'ek_nazar_tags';
 
   function loadCustomTags() {
@@ -743,18 +751,20 @@
   function guessTag(url, ogTitle) {
     const u = url.toLowerCase();
     const t = (ogTitle || '').toLowerCase();
+    if (/\/bikaner\//i.test(u) || /बीकानेर/.test(t)) return 'बीकानेर';
+    if (/\/rajasthan\//i.test(u)) return 'राजस्थान';
     if (/\/sports?\/|\/cricket\/|\/football\/|\/ipl\//i.test(u)) return 'स्पोर्ट्स';
     if (/\/business\/|\/money\/|\/market\//i.test(u)) return 'बिजनेस';
     if (/\/entertainment\/|\/bollywood\//i.test(u)) return 'बॉलीवुड';
-    if (/\/lifestyle\/|\/health\//i.test(u)) return 'लाइफस्टाइल';
-    if (/\/tech|\/gadget/i.test(u)) return 'टेक्नोलॉजी';
+    if (/\/lifestyle\//i.test(u)) return 'लाइफस्टाइल';
+    if (/\/dharm\/|\/astro\/|\/jeevan-mantra\//i.test(u)) return 'जीवन मंत्र';
+    if (/\/tech|\/gadget|\/auto\//i.test(u)) return 'टेक - ऑटो';
     if (/\/crime\/|\/murder/i.test(u)) return 'क्राइम';
-    if (/\/education\//i.test(u)) return 'एजुकेशन';
-    if (/\/rajasthan\//i.test(u)) return 'राजस्थान';
+    if (/\/education\/|\/job\//i.test(u)) return 'जॉब - एजुकेशन';
+    if (/\/health\//i.test(u)) return 'हेल्थ';
+    if (/\/utility\//i.test(u)) return 'यूटिलिटी';
     if (/\/international\/|\/world\//i.test(u)) return 'विदेश';
     if (/\/national\/|\/india\//i.test(u)) return 'देश';
-    // Bikaner-specific
-    if (/\/bikaner\//i.test(u) || /बीकानेर/.test(t)) return 'बीकानेर';
     return 'देश';
   }
 
@@ -803,7 +813,7 @@
           body: JSON.stringify({
             model: 'claude-sonnet-4-20250514', max_tokens: 500,
             tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-            messages: [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"Hindi category","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }]
+            messages: [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"one of: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, जीवन मंत्र, जॉब - एजुकेशन, टेक - ऑटो, यूटिलिटी, क्राइम, हेल्थ","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }]
           })
         });
         const data = await response.json();
@@ -1002,7 +1012,7 @@
         <div class="card-top">
           <div class="card-left">
             <div class="card-number">${i+1}</div>
-            <div class="card-tag">${s.tag}</div>
+            <div class="card-tag" style="color:#fff;background:${getTagColor(s.tag)};padding:2px 8px;border-radius:4px;">${s.tag}</div>
           </div>
           <div class="card-actions">
             <button class="card-btn" onclick="${onUp}" ${upDisabled}>↑</button>
