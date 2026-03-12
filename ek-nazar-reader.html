@@ -95,14 +95,14 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 @keyframes skelShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ── Completion Card ── */
-.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #f5f5f5; overflow: hidden; flex-shrink: 0; }
+.completion-card { min-width: 100%; width: 100%; height: 100%; display: flex; flex-direction: column; background: #fff; overflow: hidden; flex-shrink: 0; }
 .comp-top { padding: 20px 20px 14px; text-align: center; background: #fff; }
 .comp-badge { width: 52px; height: 52px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .comp-badge svg { width: 26px; height: 26px; }
 .comp-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; line-height: 1.35; padding: 0 4px; }
 .comp-sub { font-size: 13px; color: #d4500a; line-height: 1.4; font-weight: 500; }
-.comp-divider { height: 6px; background: #f5f5f5; flex-shrink: 0; }
-.comp-habit { padding: 12px 16px; background: #fff; }
+.comp-divider { height: 1px; background: #f0f0f0; flex-shrink: 0; margin: 0 16px; }
+.comp-habit { padding: 12px 16px; background: #fff; flex: 1; display: flex; flex-direction: column; }
 .comp-habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .comp-habit-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin: 0; letter-spacing: 0; text-transform: none; }
 .comp-habit-hint { font-size: 10px; color: #999; }
@@ -121,7 +121,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .timing-pill .tp-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
 .timing-pill .tp-name { font-size: 12px; font-weight: 700; color: #1a1a1a; font-family: 'Noto Sans Devanagari', sans-serif; display: block; }
 .timing-pill .tp-time { font-size: 10px; color: #999; margin-top: 2px; display: block; }
-.comp-share { padding: 10px 16px 14px; background: #fff; }
+.comp-share { padding: 10px 16px 14px; background: #fff; margin-top: auto; }
 .share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 2px solid #d4500a; border-radius: 10px; background: none; color: #d4500a; font-family: 'Noto Sans Devanagari', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
 .share-btn:active { background: rgba(212,80,10,0.06); }
 
