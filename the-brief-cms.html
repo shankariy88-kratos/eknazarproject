@@ -328,6 +328,10 @@
         <label>Video URL <span style="color:var(--muted);font-weight:400;font-size:11px;">(optional)</span></label>
         <input type="url" id="videoUrl" placeholder="https://videos.bhaskarassets.com/.../v360.mp4">
       </div>
+      <div class="form-group full">
+        <label>Deeplink <span style="color:var(--muted);font-weight:400;font-size:11px;">(Bhaskar app में खुलने वाला short link)</span></label>
+        <input type="url" id="deepLink" placeholder="https://dainik.bhaskar.com/... या app deeplink">
+      </div>
 
       <div class="form-group full">
         <label>Summary का तरीका</label>
@@ -461,6 +465,10 @@
       <div class="form-group full">
         <label>Video URL <span style="color:var(--muted);font-weight:400;font-size:11px;">(optional)</span></label>
         <input type="url" id="modalVideoUrl" placeholder="https://videos.bhaskarassets.com/.../v360.mp4">
+      </div>
+      <div class="form-group full">
+        <label>Deeplink <span style="color:var(--muted);font-weight:400;font-size:11px;">(Bhaskar app में खुलने वाला short link)</span></label>
+        <input type="url" id="modalDeepLink" placeholder="https://dainik.bhaskar.com/... या app deeplink">
       </div>
 
       <!-- Summary mode radio -->
@@ -949,13 +957,14 @@
     const imageUrlVal = document.getElementById('imageUrl').value.trim();
     const videoUrlVal = document.getElementById('videoUrl').value.trim();
     const articleUrlVal = document.getElementById('articleUrl').value.trim();
+    const deepLinkVal = document.getElementById('deepLink').value.trim() || articleUrlVal;
     stories.push({ id: Date.now(), tag,
       headline: headlineHTML,
       summary: summaryHTML,
       imageUrl:   imageUrlVal,
       videoUrl:   videoUrlVal,
       articleUrl: articleUrlVal,
-      deepLink:   articleUrlVal });
+      deepLink:   deepLinkVal });
     renderLiveBundle(); clearMainForm(); hideError();
     if (jsonVisible) updateJSON();
   }
@@ -963,7 +972,7 @@
   function clearMainForm() {
     document.getElementById('storyHeadline').innerHTML='';
     document.getElementById('summaryText').innerHTML='';
-    ['imageUrl','videoUrl','articleUrl'].forEach(id=>document.getElementById(id).value='');
+    ['imageUrl','videoUrl','articleUrl','deepLink'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('summaryArea').style.display='none';
     // Reset to AI mode
     document.querySelector('input[name="summaryMode"][value="ai"]').checked = true;
@@ -1293,7 +1302,7 @@
     setModalSummaryMode('ai');
 
     document.getElementById('modalArticleUrl').value = story?.articleUrl || '';
-    // deepLink auto-derived from articleUrl
+    document.getElementById('modalDeepLink').value = story?.deepLink || '';
     populateTagSelect('modalTag', story?.tag || DEFAULT_TAGS[0]);
     updateModalWC();
     document.getElementById('modalOverlay').classList.add('open');
@@ -1358,7 +1367,8 @@
     const imageUrl = document.getElementById('modalImageUrl').value.trim();
     const videoUrl = document.getElementById('modalVideoUrl').value.trim();
     const articleUrl = document.getElementById('modalArticleUrl').value.trim();
-    const storyData = { tag, headline, summary, deepLink: articleUrl, articleUrl, imageUrl, videoUrl };
+    const deepLink = document.getElementById('modalDeepLink').value.trim() || articleUrl;
+    const storyData = { tag, headline, summary, deepLink, articleUrl, imageUrl, videoUrl };
 
     if (ctx.mode === 'live-edit') {
       const s = stories.find(s => s.id === ctx.storyId);
