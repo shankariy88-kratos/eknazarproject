@@ -233,6 +233,20 @@
   /* Toast */
   .save-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--success); color: #0d0f12; font-size: 13px; font-weight: 600; padding: 11px 22px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 999; }
   .save-toast.show { opacity: 1; }
+
+  /* ── Feed View ── */
+  .feed-row { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; background:var(--surface); cursor:pointer; transition:all 0.15s; }
+  .feed-row:hover { border-color:var(--accent); }
+  .feed-row.selected { background:rgba(200,134,10,0.06); border-color:var(--accent); }
+  .feed-checkbox { width:18px; height:18px; margin-top:3px; flex-shrink:0; accent-color:var(--accent); cursor:pointer; }
+  .feed-title { flex:1; font-size:14px; font-weight:600; line-height:1.5; color:var(--text); }
+  .feed-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+  .feed-category { font-size:10px; font-weight:700; color:#fff; padding:3px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em; }
+  .feed-time { font-size:11px; color:var(--muted); white-space:nowrap; }
+  .feed-add-btn { padding:6px 14px; font-size:11px; white-space:nowrap; }
+  .feed-body-preview { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; font-size:13px; color:var(--muted); max-height:200px; overflow-y:auto; line-height:1.7; margin-top:8px; }
+  .feed-empty { text-align:center; padding:60px 20px; color:var(--muted); }
+  .feed-empty div:first-child { font-size:32px; margin-bottom:10px; }
 </style>
 </head>
 <body>
@@ -244,6 +258,7 @@
     <nav class="nav-tabs">
       <button class="nav-tab active" id="tab-editor" onclick="switchView('editor')">✏️ &nbsp;New Bundle</button>
       <button class="nav-tab" id="tab-history" onclick="switchView('history')">📋 &nbsp;History</button>
+      <button class="nav-tab" id="tab-feed" onclick="switchView('feed')">📡 &nbsp;Article Feed</button>
     </nav>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -260,6 +275,11 @@
     <button class="btn btn-primary" onclick="saveApiKey()" style="padding:9px 14px;">Save</button>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-top:8px;">Key is saved in your browser only. Never shared.</div>
+  <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:14px;">Metabase API Key</div>
+  <div style="display:flex;gap:8px;">
+    <input type="password" id="metabaseKeyInput" placeholder="Metabase key..." style="flex:1;font-size:13px;">
+    <button class="btn btn-primary" onclick="saveMetabaseKey()" style="padding:9px 14px;">Save</button>
+  </div>
 </div>
 
 <!-- ══ EDITOR VIEW ══ -->
@@ -351,6 +371,16 @@
       </div>
     </div>
 
+    <!-- Article Body from Feed -->
+    <div id="feedBodySection" class="full" style="display:none;">
+      <div class="divider"></div>
+      <label style="display:flex;align-items:center;justify-content:space-between;">
+        Article Body (Feed से)
+        <button class="btn" style="padding:3px 8px;font-size:10px;" onclick="document.getElementById('feedBodySection').style.display='none'">✕ Hide</button>
+      </label>
+      <div id="feedBodyPreview" class="feed-body-preview"></div>
+    </div>
+
     <div id="summaryArea" style="display:none">
       <div class="divider"></div>
       <label>AI Summary (हिंदी) — Edit if needed</label>
@@ -420,6 +450,29 @@
     <div class="history-stats" id="historyStats"></div>
   </div>
   <div id="historyContent"></div>
+</div>
+
+<!-- ══ FEED VIEW ══ -->
+<div id="view-feed" style="display:none; height:calc(100vh - 60px); overflow-y:auto; padding:32px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div style="font-size:18px;font-weight:700;">📡 Article Feed <span style="font-size:12px;color:var(--muted);font-weight:400;">from Metabase</span></div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input type="text" id="feedSearch" placeholder="Search headlines..." oninput="filterFeed()" style="width:220px;padding:8px 12px;font-size:13px;">
+      <select id="feedCategoryFilter" onchange="filterFeed()" style="padding:8px 12px;font-size:13px;">
+        <option value="">All Categories</option>
+      </select>
+      <button class="btn btn-primary" onclick="fetchArticleFeed()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div id="feedLoading" style="display:none;text-align:center;padding:40px;color:var(--muted);">
+    <div style="font-size:24px;margin-bottom:8px;">⏳</div>
+    <div>Fetching articles from Metabase...</div>
+  </div>
+  <div id="feedList"></div>
+  <div id="feedActions" style="display:none;position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;margin:0 -32px;align-items:center;justify-content:space-between;">
+    <span id="feedSelectedCount" style="font-size:13px;color:var(--muted);">0 selected</span>
+    <button class="btn btn-primary" onclick="addSelectedToBundle()">Add Selected to Bundle →</button>
+  </div>
 </div>
 
 <!-- ══ EDIT / ADD MODAL ══ -->
@@ -544,6 +597,8 @@
   let stories = [];
   let jsonVisible = false;
   const STORAGE_KEY = 'ek_nazar_bundles';
+  let feedArticles = [];
+  let currentFeedBody = '';
 
   const TAG_COLORS = {
     'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
@@ -568,9 +623,12 @@
   function switchView(v) {
     document.getElementById('view-editor').style.display = v === 'editor' ? 'grid' : 'none';
     document.getElementById('view-history').style.display = v === 'history' ? 'block' : 'none';
+    document.getElementById('view-feed').style.display = v === 'feed' ? 'block' : 'none';
     document.getElementById('tab-editor').classList.toggle('active', v === 'editor');
     document.getElementById('tab-history').classList.toggle('active', v === 'history');
+    document.getElementById('tab-feed').classList.toggle('active', v === 'feed');
     if (v === 'history') renderHistory();
+    if (v === 'feed' && !feedArticles.length) fetchArticleFeed();
   }
 
   // ── Tag ──
@@ -623,6 +681,37 @@
 
   // ── AI summarize (main form) ──
   async function summarizeArticle() {
+    // If we have feed body from Metabase, use it directly (no URL fetch needed)
+    if (currentFeedBody) {
+      const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
+      if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
+      hideError();
+      document.getElementById('loadingArea').style.display = 'flex';
+      document.getElementById('summaryArea').style.display = 'none';
+      document.getElementById('summarizeBtn').disabled = true;
+      try {
+        const bodyText = currentFeedBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        const body = {
+          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+          messages: [{ role: 'user', content: 'You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n' + bodyText + '\n---\n\n' + getSummaryPrompt() }]
+        };
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+        if (!text) throw new Error('Summary नहीं मिली');
+        document.getElementById('summaryText').innerHTML = formatSummaryHTML(text);
+        document.getElementById('summaryArea').style.display = 'block';
+        updateWordCount();
+      } catch(err) { showError('[E05] AI Error — ' + err.message); }
+      finally { document.getElementById('loadingArea').style.display='none'; document.getElementById('summarizeBtn').disabled=false; }
+      return;
+    }
+    // Original URL-based flow
     const url = document.getElementById('articleUrl').value.trim();
     if (!url) { showError('[E04] Article URL खाली है — Bhaskar का article URL डालें'); return; }
     hideError();
@@ -633,7 +722,6 @@
       const summary = await callSummarize(url);
       document.getElementById('summaryText').innerHTML = formatSummaryHTML(summary);
       document.getElementById('summaryArea').style.display = 'block';
-      updateWordCount();
       updateWordCount();
     } catch(err) { showError('[E05] AI Error — ' + err.message); }
     finally { document.getElementById('loadingArea').style.display='none'; document.getElementById('summarizeBtn').disabled=false; }
@@ -1002,6 +1090,9 @@
     // Reset to AI mode
     document.querySelector('input[name="summaryMode"][value="ai"]').checked = true;
     setSummaryMode('ai');
+    currentFeedBody = '';
+    var feedBodySection = document.getElementById('feedBodySection');
+    if (feedBodySection) feedBodySection.style.display = 'none';
   }
 
   // ── Live bundle: render ──
@@ -1917,6 +2008,201 @@
 
   updateKeyStatus();
   populateTagSelect('storyTag');
+  var mk = localStorage.getItem('ek_nazar_metabase_key');
+  if (mk) document.getElementById('metabaseKeyInput').value = mk;
+
+  // ── Metabase Key ──
+  function saveMetabaseKey() {
+    const key = document.getElementById('metabaseKeyInput').value.trim();
+    if (!key) { alert('Key खाली है'); return; }
+    localStorage.setItem('ek_nazar_metabase_key', key);
+    showToast('Metabase key saved ✓');
+  }
+
+  // ── Summary Prompt Helper ──
+  function getSummaryPrompt() {
+    return `Write a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else`;
+  }
+
+  // ── Fetch from Metabase ──
+  async function fetchArticleFeed() {
+    const apiKey = localStorage.getItem('ek_nazar_metabase_key');
+    if (!apiKey) {
+      document.getElementById('feedList').innerHTML = '<div class="feed-empty"><div>🔑</div><div>Metabase API Key सेट करें<br><small>ऊपर 🔑 बटन से key डालें</small></div></div>';
+      return;
+    }
+    document.getElementById('feedLoading').style.display = 'block';
+    document.getElementById('feedList').innerHTML = '';
+    try {
+      const resp = await fetch('https://metabase.dbdigital.in/api/card/247/query/json', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status + ' — API key check करें');
+      feedArticles = await resp.json();
+      populateFeedCategoryFilter();
+      renderFeedList(feedArticles);
+    } catch(e) {
+      document.getElementById('feedList').innerHTML = '<div class="error-msg">Feed fetch failed: ' + e.message + '</div>';
+    } finally {
+      document.getElementById('feedLoading').style.display = 'none';
+    }
+  }
+
+  function populateFeedCategoryFilter() {
+    const cats = [...new Set(feedArticles.map(a => a.CATEGORY).filter(Boolean))];
+    const sel = document.getElementById('feedCategoryFilter');
+    sel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+  }
+
+  function filterFeed() {
+    const search = (document.getElementById('feedSearch').value || '').toLowerCase();
+    const cat = document.getElementById('feedCategoryFilter').value;
+    const filtered = feedArticles.filter(a => {
+      if (cat && a.CATEGORY !== cat) return false;
+      if (search && !(a.TITLE || '').toLowerCase().includes(search)) return false;
+      return true;
+    });
+    renderFeedList(filtered);
+  }
+
+  function renderFeedList(articles) {
+    const container = document.getElementById('feedList');
+    if (!articles.length) {
+      container.innerHTML = '<div class="feed-empty"><div>📭</div><div>कोई article नहीं मिला</div></div>';
+      return;
+    }
+    container.innerHTML = articles.map((a, i) => {
+      const idx = feedArticles.indexOf(a);
+      const time = a.PUBLISHED_TIME ? new Date(a.PUBLISHED_TIME).toLocaleTimeString('hi-IN', {hour:'2-digit', minute:'2-digit'}) : '';
+      const hasVideo = a.VIDEO_URL && a.VIDEO_URL !== 'null' && a.VIDEO_URL !== '';
+      return '<div class="feed-row" onclick="toggleFeedSelect(this,' + idx + ')">' +
+        '<input type="checkbox" class="feed-checkbox" data-idx="' + idx + '" onclick="event.stopPropagation();updateFeedSelectionCount()">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="feed-title">' + (a.TITLE || 'No title') + '</div>' +
+          '<div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">' +
+            '<span class="feed-category" style="background:' + getTagColor(mapMetabaseCategory(a.CATEGORY)) + ';">' + (a.CATEGORY || '') + '</span>' +
+            '<span class="feed-time">' + time + '</span>' +
+            (a.CITY ? '<span class="feed-time">📍 ' + a.CITY + '</span>' : '') +
+            (hasVideo ? '<span class="feed-time">🎬 Video</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<button class="btn btn-primary feed-add-btn" onclick="event.stopPropagation();addFeedToEditor(' + idx + ')">→ Add</button>' +
+      '</div>';
+    }).join('');
+    updateFeedSelectionCount();
+  }
+
+  function toggleFeedSelect(row, idx) {
+    const cb = row.querySelector('.feed-checkbox');
+    cb.checked = !cb.checked;
+    row.classList.toggle('selected', cb.checked);
+    updateFeedSelectionCount();
+  }
+
+  function updateFeedSelectionCount() {
+    const checked = document.querySelectorAll('.feed-checkbox:checked');
+    const countEl = document.getElementById('feedSelectedCount');
+    const actionsEl = document.getElementById('feedActions');
+    if (countEl) countEl.textContent = checked.length + ' selected';
+    if (actionsEl) actionsEl.style.display = checked.length > 0 ? 'flex' : 'none';
+  }
+
+  // ── Category Mapping ──
+  function mapMetabaseCategory(cat) {
+    if (!cat) return 'देश';
+    const MAP = {
+      'Sports': 'स्पोर्ट्स', 'Business': 'बिजनेस', 'Entertainment': 'बॉलीवुड',
+      'Lifestyle': 'लाइफस्टाइल', 'Tech': 'टेक - ऑटो', 'International': 'विदेश',
+      'National': 'देश', 'Indore': 'राज्य-शहर', 'Crime': 'क्राइम', 'Health': 'हेल्थ',
+      'Education': 'एजुकेशन'
+    };
+    const allTags = getAllTags();
+    if (allTags.includes(cat)) return cat;
+    return MAP[cat] || cat;
+  }
+
+  // ── Add Feed Article to Editor ──
+  function addFeedToEditor(idx) {
+    const a = feedArticles[idx];
+    if (!a) return;
+
+    // Switch to editor view
+    switchView('editor');
+
+    // Pre-fill fields
+    document.getElementById('storyHeadline').innerHTML = a.TITLE || '';
+    document.getElementById('articleUrl').value = a.ARTICLE_URL || '';
+    document.getElementById('imageUrl').value = a.IMAGE_URL || '';
+    document.getElementById('deepLink').value = '';
+
+    // Video
+    const videoInput = document.getElementById('videoUrl');
+    if (videoInput) {
+      videoInput.value = (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '';
+    }
+
+    // Category mapping
+    const mapped = mapMetabaseCategory(a.CATEGORY);
+    const tagSel = document.getElementById('storyTag');
+    if (tagSel) {
+      let found = false;
+      for (let i = 0; i < tagSel.options.length; i++) {
+        if (tagSel.options[i].value === mapped) { tagSel.selectedIndex = i; found = true; break; }
+      }
+      if (!found && a.CATEGORY) {
+        for (let i = 0; i < tagSel.options.length; i++) {
+          if (tagSel.options[i].value === a.CATEGORY) { tagSel.selectedIndex = i; found = true; break; }
+        }
+      }
+    }
+
+    // Store body for AI summarization
+    currentFeedBody = a.BODY || '';
+
+    // Strip HTML tags for display
+    const bodyText = currentFeedBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Show article body reference
+    const bodySection = document.getElementById('feedBodySection');
+    const bodyPreview = document.getElementById('feedBodyPreview');
+    if (bodySection && bodyPreview && bodyText) {
+      bodyPreview.textContent = bodyText;
+      bodySection.style.display = 'block';
+    }
+
+    // Auto-color headline
+    if (typeof autoColorHeadline === 'function') autoColorHeadline();
+
+    showToast('✓ Article fields auto-filled from feed');
+  }
+
+  // ── Add Selected to Bundle (bulk) ──
+  function addSelectedToBundle() {
+    const checked = document.querySelectorAll('.feed-checkbox:checked');
+    if (!checked.length) { alert('कोई article select नहीं की'); return; }
+    let added = 0;
+    checked.forEach(cb => {
+      const idx = parseInt(cb.dataset.idx);
+      const a = feedArticles[idx];
+      if (!a) return;
+      stories.push({
+        id: Date.now() + Math.random(),
+        tag: mapMetabaseCategory(a.CATEGORY),
+        headline: a.TITLE || '',
+        summary: '',
+        imageUrl: a.IMAGE_URL || '',
+        videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
+        articleUrl: a.ARTICLE_URL || '',
+        deepLink: ''
+      });
+      added++;
+    });
+    switchView('editor');
+    renderLiveBundle();
+    showToast(added + ' articles bundle में जोड़ी गईं — summaries edit करें');
+  }
 </script>
 <!-- ══ Card Preview Modal ══ -->
 <div id="cardPreviewOverlay" style="display:none;position:fixed;inset:0;background:rgba(26,18,8,0.7);z-index:300;align-items:center;justify-content:center;padding:16px;">
