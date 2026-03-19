@@ -2345,11 +2345,12 @@
   }
 
   function feedAddChoiceNew() {
+    const idx = pendingFeedIdx;
     closeFeedAddChoice();
-    if (pendingFeedIdx === -1) {
+    if (idx === -1) {
       addSelectedToBundle();
-    } else if (pendingFeedIdx >= 0) {
-      addFeedToEditor(pendingFeedIdx);
+    } else if (idx >= 0) {
+      addFeedToEditor(idx);
     }
   }
 
@@ -2419,57 +2420,23 @@
     const a = feedArticles[idx];
     if (!a) return;
 
-    // Switch to editor view
+    // Add story directly to the live bundle
+    stories.push({
+      id: Date.now() + Math.random(),
+      tag: mapMetabaseCategory(a.CATEGORY),
+      headline: a.TITLE || '',
+      summary: '',
+      imageUrl: a.IMAGE_URL || '',
+      videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
+      articleUrl: a.ARTICLE_URL || '',
+      deepLink: a.ARTICLE_DEEPLINK || '',
+      feedBody: a.BODY || ''
+    });
+
+    // Switch to editor and render
     switchView('editor');
-
-    // Pre-fill fields
-    document.getElementById('storyHeadline').innerHTML = a.TITLE || '';
-    document.getElementById('articleUrl').value = a.ARTICLE_URL || '';
-    document.getElementById('imageUrl').value = a.IMAGE_URL || '';
-    document.getElementById('deepLink').value = a.ARTICLE_DEEPLINK || '';
-
-    // Video
-    const videoInput = document.getElementById('videoUrl');
-    if (videoInput) {
-      videoInput.value = (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '';
-    }
-
-    // Category mapping
-    const mapped = mapMetabaseCategory(a.CATEGORY);
-    const tagSel = document.getElementById('storyTag');
-    if (tagSel) {
-      let found = false;
-      for (let i = 0; i < tagSel.options.length; i++) {
-        if (tagSel.options[i].value === mapped) { tagSel.selectedIndex = i; found = true; break; }
-      }
-      if (!found && a.CATEGORY) {
-        for (let i = 0; i < tagSel.options.length; i++) {
-          if (tagSel.options[i].value === a.CATEGORY) { tagSel.selectedIndex = i; found = true; break; }
-        }
-      }
-    }
-
-    // Store body for AI summarization
-    currentFeedBody = a.BODY || '';
-
-    // Strip HTML tags for display
-    const bodyText = currentFeedBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-
-    // Show article body reference
-    const bodySection = document.getElementById('feedBodySection');
-    const bodyPreview = document.getElementById('feedBodyPreview');
-    if (bodySection && bodyPreview && bodyText) {
-      bodyPreview.textContent = bodyText;
-      bodySection.style.display = 'block';
-    }
-
-    // Auto-color headline
-    if (typeof autoColorHeadline === 'function') autoColorHeadline();
-
-    // Update Summarize button label
-    updateSummarizeBtnLabel();
-
-    showToast('✓ Article fields auto-filled from feed');
+    renderLiveBundle();
+    showToast('✓ Article bundle में जोड़ी गई — summary edit करें');
   }
 
   // ── Add Selected to Bundle (bulk) ──
