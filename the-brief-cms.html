@@ -235,11 +235,11 @@
   .save-toast.show { opacity: 1; }
 
   /* ── Feed View ── */
-  .feed-row { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; background:var(--surface); cursor:pointer; transition:all 0.15s; }
+  .feed-row { display:flex; align-items:center; gap:12px; padding:14px 16px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; background:var(--surface); cursor:pointer; transition:all 0.15s; }
   .feed-row:hover { border-color:var(--accent); }
   .feed-row.selected { background:rgba(200,134,10,0.06); border-color:var(--accent); }
   .feed-checkbox { width:18px; height:18px; margin-top:3px; flex-shrink:0; accent-color:var(--accent); cursor:pointer; }
-  .feed-title { flex:1; font-size:14px; font-weight:600; line-height:1.5; color:var(--text); }
+  .feed-title { font-size:14px; font-weight:600; line-height:1.5; color:var(--text); }
   .feed-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
   .feed-category { font-size:10px; font-weight:700; color:#fff; padding:3px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:0.05em; }
   .feed-time { font-size:11px; color:var(--muted); white-space:nowrap; }
@@ -2088,7 +2088,7 @@
             (hasVideo ? '<span class="feed-time">🎬 Video</span>' : '') +
           '</div>' +
         '</div>' +
-        '<a href="' + (a.ARTICLE_URL || '#') + '" target="_blank" class="btn btn-ghost feed-add-btn" onclick="event.stopPropagation()" style="text-decoration:none;">👁 View</a>' +
+        '<a href="' + (a.ARTICLE_URL || '#') + '" target="_blank" class="btn btn-ghost feed-add-btn" onclick="event.stopPropagation()" style="text-decoration:none;width:auto;">👁 View</a>' +
         '<button class="btn btn-primary feed-add-btn" onclick="event.stopPropagation();addFeedToEditor(' + idx + ')">→ Add</button>' +
       '</div>';
     }).join('');
