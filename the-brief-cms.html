@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ek Nazar — Editorial CMS</title>
+<title>Ek Nazar — Editorial CMS v3.8.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -638,6 +638,31 @@
   let currentFeedBody = '';
   let feedSortAsc = false; // false = latest first (default), true = oldest first
 
+  // ── Summary Prompt Helper (used by multiple functions) ──
+  function getSummaryPrompt() {
+    return `Write a Hindi news summary as bullet points. Requirements:\n` + getSummaryRules();
+  }
+
+  function getSummaryRules() {
+    return `- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else`;
+  }
+
+  // ── Shared API Helper ──
+  async function callClaude(messages, opts = {}) {
+    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
+    if (!apiKey) { toggleKeyPanel(); throw new Error('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); }
+    const body = { model: 'claude-sonnet-4-20250514', max_tokens: opts.maxTokens || 1000, messages };
+    if (opts.tools) body.tools = opts.tools;
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify(body)
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  }
+
   const TAG_COLORS = {
     'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
     'स्पोर्ट्स':'#0F86F5','बिजनेस':'#3E9E3E','बॉलीवुड':'#9D46F3',
@@ -762,26 +787,13 @@
   async function summarizeArticle() {
     // If we have feed body from Metabase, use it directly (no URL fetch needed)
     if (currentFeedBody) {
-      const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-      if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
       hideError();
       document.getElementById('loadingArea').style.display = 'flex';
       document.getElementById('summaryArea').style.display = 'none';
       document.getElementById('summarizeBtn').disabled = true;
       try {
         const bodyText = currentFeedBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-        const body = {
-          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-          messages: [{ role: 'user', content: 'You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n' + bodyText + '\n---\n\n' + getSummaryPrompt() }]
-        };
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify(body)
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+        const text = await callClaude([{ role: 'user', content: 'You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n' + bodyText + '\n---\n\n' + getSummaryPrompt() }]);
         if (!text) throw new Error('Summary नहीं मिली');
         document.getElementById('summaryText').innerHTML = formatSummaryHTML(text);
         document.getElementById('summaryArea').style.display = 'block';
@@ -807,10 +819,7 @@
   }
 
   async function callSummarize(url) {
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); throw new Error('[E08] API Key missing'); }
-
-    const SUMMARY_PROMPT = `Write a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else`;
+    const SUMMARY_PROMPT = getSummaryPrompt();
 
     // Tier 1: Try fetching actual article HTML
     let articleText = '';
@@ -821,36 +830,23 @@
       console.log('Summarize Tier 1 (fetch) failed:', e.message);
     }
 
-    let body;
+    let text;
     if (articleText && articleText.length >= 100) {
       // Tier 1 succeeded: send real article text (no web_search needed, faster + cheaper)
-      body = {
-        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n${articleText}\n---\n\n${SUMMARY_PROMPT}` }]
-      };
+      text = await callClaude([{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n${articleText}\n---\n\n${SUMMARY_PROMPT}` }]);
     } else {
       // Tier 2: Fallback to web_search (less reliable but works for indexed articles)
-      body = {
-        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Search for and read this article: ${url}\n\n${SUMMARY_PROMPT}` }]
-      };
+      text = await callClaude(
+        [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Search for and read this article: ${url}\n\n${SUMMARY_PROMPT}` }],
+        { tools: [{ type: 'web_search_20250305', name: 'web_search' }] }
+      );
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
     if (!text) throw new Error('Summary नहीं मिली। URL check करें।');
     return text;
   }
 
   async function callSummarizeWithInstruction(url, instruction, existingText) {
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); throw new Error('[E08] API Key missing'); }
     const hasUrl = url && url.trim();
     let articleContext = '';
     if (hasUrl && !existingText) {
@@ -862,14 +858,7 @@
     const prompt = existingText
       ? `You are editing an existing Hindi news summary. Current summary:\n${existingText}\n\nInstruction: ${instruction}\n\nReturn only the updated bullet points, each starting with •, nothing else.`
       : `You are an editorial assistant for Dainik Bhaskar.\n\nArticle text:\n---\n${articleContext}\n---\n\nInstruction: ${instruction}\n\nReturn only bullet points, each starting with •, in simple Hindi, max 15 words each, bold key facts with **bold**. Nothing else.`;
-    const body = { model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] };
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    const text = await callClaude([{ role: 'user', content: prompt }]);
     if (!text) throw new Error('Response empty');
     return text;
   }
@@ -947,26 +936,28 @@
     return 'देश';
   }
 
-  async function extractFromUrl() {
-    const urlInput = document.getElementById('articleUrl');
+  // ── Shared Extract from URL (main + modal) ──
+  async function extractFromUrlGeneric(target) {
+    const isModal = target === 'modal';
+    const urlInputId = isModal ? 'modalArticleUrl' : 'articleUrl';
+    const btnId = isModal ? 'modalExtractBtn' : 'extractBtn';
+    const loadingId = isModal ? 'modalExtractLoading' : 'extractLoading';
+    const showErr = isModal ? (msg) => alert(msg) : showError;
+
+    const urlInput = document.getElementById(urlInputId);
     let url = urlInput.value.trim();
-    if (!url) { showError('[E12] URL खाली है — Article URL paste करें'); return; }
+    if (!url) { showErr(isModal ? 'URL खाली है — Article URL paste करें' : '[E12] URL खाली है — Article URL paste करें'); return; }
+    if (!url.startsWith('http')) { showErr(isModal ? 'Extract के लिए http/https URL चाहिए' : '[E13] Extract के लिए http/https URL चाहिए — article का web URL paste करें'); return; }
 
-    if (!url.startsWith('http')) {
-      showError('[E13] Extract के लिए http/https URL चाहिए — article का web URL paste करें');
-      return;
-    }
-
-    // Block shortened URLs — CORS proxy can't follow all redirects
     const isShortUrl = /^https?:\/\/(dainik\.bhaskar\.com|bfrk\.in|bit\.ly|t\.co)\/[a-zA-Z0-9]{4,20}$/i.test(url);
     if (isShortUrl) {
-      showError('⚠️ Short URL काम नहीं करेगा — पहले ये link browser में खोलें, फिर address bar से full URL copy करें (www.bhaskar.com/local/... वाला)');
+      showErr('⚠️ Short URL काम नहीं करेगा — पहले ये link browser में खोलें, फिर address bar से full URL copy करें' + (isModal ? '' : ' (www.bhaskar.com/local/... वाला)'));
       return;
     }
 
-    hideError();
-    document.getElementById('extractBtn').disabled = true;
-    document.getElementById('extractLoading').style.display = 'flex';
+    if (!isModal) hideError();
+    document.getElementById(btnId).disabled = true;
+    document.getElementById(loadingId).style.display = 'flex';
 
     try {
       // Tier 1: Fetch actual HTML and parse OG tags (fast, accurate, no API cost)
@@ -978,26 +969,16 @@
           meta = { headline: og.title, tag: guessTag(url, og.title), imageUrl: og.image || '' };
         }
       } catch (fetchErr) {
-        console.log('Tier 1 (CORS fetch) failed:', fetchErr.message);
+        console.log((isModal ? 'Modal' : '') + ' Tier 1 (CORS fetch) failed:', fetchErr.message);
       }
 
       // Tier 2: Fallback to web_search API (for Cloudflare-blocked sites)
       if (!meta || !meta.headline) {
-        const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-        if (!apiKey) { toggleKeyPanel(); throw new Error('API Key सेट नहीं — 🔑 बटन से key डालें'); }
         const searchHint = url.split('/').pop().replace(/\.html?$/,'').replace(/-\d+$/,'').replace(/-/g,' ');
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514', max_tokens: 500,
-            tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-            messages: [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"one of: बीकानेर, राजस्थान, राज्य-शहर, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, टेक - ऑटो, यूटिलिटी","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }]
-          })
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+        const text = await callClaude(
+          [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"one of: बीकानेर, राजस्थान, राज्य-शहर, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, टेक - ऑटो, यूटिलिटी","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }],
+          { maxTokens: 500, tools: [{ type: 'web_search_20250305', name: 'web_search' }] }
+        );
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           meta = JSON.parse(jsonMatch[0]);
@@ -1010,52 +991,54 @@
         throw new Error('Headline/image नहीं मिली — URL check करें या manually भरें');
       }
 
-      populateExtracted(meta);
+      const headlineId = isModal ? 'modalHeadline' : 'storyHeadline';
+      const tagSelectId = isModal ? 'modalTag' : 'storyTag';
+      const imageUrlId = isModal ? 'modalImageUrl' : 'imageUrl';
+      const autoColorFn = isModal ? autoColorModalHeadline : autoColorHeadline;
+      populateExtractedGeneric(meta, headlineId, tagSelectId, imageUrlId, autoColorFn);
+      showToast('✓ ' + (isModal ? 'Modal: ' : '') + 'Headline, Tag auto-filled!' + (meta.imageUrl ? ' Image भी मिली!' : ''));
 
     } catch (e) {
-      showError('[E14] Extract failed — ' + e.message);
+      showErr((isModal ? '' : '[E14] ') + 'Extract failed — ' + e.message);
     } finally {
-      document.getElementById('extractBtn').disabled = false;
-      document.getElementById('extractLoading').style.display = 'none';
+      document.getElementById(btnId).disabled = false;
+      document.getElementById(loadingId).style.display = 'none';
     }
   }
 
-  function populateExtracted(meta) {
-    // Headline
+  function extractFromUrl() { return extractFromUrlGeneric('main'); }
+  function modalExtractFromUrl() { return extractFromUrlGeneric('modal'); }
+
+  // ── Shared populate extracted metadata ──
+  function populateExtractedGeneric(meta, headlineId, tagSelectId, imageUrlId, autoColorFn) {
     if (meta.headline) {
-      const hEl = document.getElementById('storyHeadline');
+      const hEl = document.getElementById(headlineId);
       hEl.innerHTML = meta.headline;
       flashField(hEl.closest('.headline-editor-wrap'));
     }
 
-    // Tag
     if (meta.tag) {
-      const tagSel = document.getElementById('storyTag');
+      const tagSel = document.getElementById(tagSelectId);
       const allTags = getAllTags();
       if (allTags.includes(meta.tag)) {
         tagSel.value = meta.tag;
       } else {
-        // Add as custom tag
         const custom = loadCustomTags();
         if (!custom.includes(meta.tag)) {
           custom.push(meta.tag);
           localStorage.setItem(TAGS_KEY, JSON.stringify(custom));
         }
-        populateTagSelect('storyTag', meta.tag);
+        populateTagSelect(tagSelectId, meta.tag);
       }
       flashField(tagSel);
     }
 
-    // Image URL
     if (meta.imageUrl) {
-      document.getElementById('imageUrl').value = meta.imageUrl;
-      flashField(document.getElementById('imageUrl'));
+      document.getElementById(imageUrlId).value = meta.imageUrl;
+      flashField(document.getElementById(imageUrlId));
     }
 
-    // Auto-color headline before ":" with tag color
-    autoColorHeadline();
-
-    showToast('✓ Headline, Tag auto-filled!' + (meta.imageUrl ? ' Image भी मिली!' : ''));
+    autoColorFn();
   }
 
   function flashField(el) {
@@ -1560,89 +1543,7 @@
     wc.style.color = color;
   }
 
-  // ── Modal Extract (mirrors main extractFromUrl) ──
-  async function modalExtractFromUrl() {
-    const urlInput = document.getElementById('modalArticleUrl');
-    let url = urlInput.value.trim();
-    if (!url) { alert('URL खाली है — Article URL paste करें'); return; }
-    if (!url.startsWith('http')) { alert('Extract के लिए http/https URL चाहिए'); return; }
-    const isShortUrl = /^https?:\/\/(dainik\.bhaskar\.com|bfrk\.in|bit\.ly|t\.co)\/[a-zA-Z0-9]{4,20}$/i.test(url);
-    if (isShortUrl) { alert('⚠️ Short URL काम नहीं करेगा — पहले browser में खोलें, फिर full URL copy करें'); return; }
-
-    document.getElementById('modalExtractBtn').disabled = true;
-    document.getElementById('modalExtractLoading').style.display = 'flex';
-
-    try {
-      let meta = null;
-      try {
-        const html = await fetchArticleHtml(url);
-        const og = parseOgTags(html);
-        if (og.title) {
-          meta = { headline: og.title, tag: guessTag(url, og.title), imageUrl: og.image || '' };
-        }
-      } catch (fetchErr) { console.log('Modal Tier 1 failed:', fetchErr.message); }
-
-      if (!meta || !meta.headline) {
-        const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-        if (!apiKey) { toggleKeyPanel(); throw new Error('API Key सेट नहीं — 🔑 बटन से key डालें'); }
-        const searchHint = url.split('/').pop().replace(/\.html?$/,'').replace(/-\d+$/,'').replace(/-/g,' ');
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514', max_tokens: 500,
-            tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-            messages: [{ role: 'user', content: `Search for this Dainik Bhaskar Hindi news article: ${url}\nSearch hint: "${searchHint}"\n\nExtract COMPLETE Hindi headline (including subtitle after colon), category tag, and article image URL (from images.bhaskar.com or bhaskarassets.com CDN, NOT default placeholders).\n\nReturn ONLY this JSON:\n{"headline":"complete Hindi headline","tag":"one of: बीकानेर, राजस्थान, देश, विदेश, बिजनेस, स्पोर्ट्स, बॉलीवुड, लाइफस्टाइल, टेक - ऑटो, यूटिलिटी","imageUrl":"CDN image URL or empty"}\n\nRules: empty string "" for missing fields. Hindi headline only. No apologies in values. JSON only.` }]
-          })
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          meta = JSON.parse(jsonMatch[0]);
-          if (meta.headline && /^(sorry|i cannot|i could|i was|i'm|unable|unfortunately)/i.test(meta.headline.trim())) meta.headline = '';
-          if (!meta.tag) meta.tag = guessTag(url, meta.headline);
-        }
-      }
-
-      if (!meta || (!meta.headline && !meta.imageUrl)) {
-        throw new Error('Headline/image नहीं मिली — URL check करें या manually भरें');
-      }
-
-      populateModalExtracted(meta);
-
-    } catch (e) { alert('Extract failed — ' + e.message); }
-    finally {
-      document.getElementById('modalExtractBtn').disabled = false;
-      document.getElementById('modalExtractLoading').style.display = 'none';
-    }
-  }
-
-  function populateModalExtracted(meta) {
-    if (meta.headline) {
-      const hEl = document.getElementById('modalHeadline');
-      hEl.innerHTML = meta.headline;
-      flashField(hEl.closest('.headline-editor-wrap'));
-    }
-    if (meta.tag) {
-      const tagSel = document.getElementById('modalTag');
-      const allTags = getAllTags();
-      if (allTags.includes(meta.tag)) { tagSel.value = meta.tag; }
-      else {
-        const custom = loadCustomTags();
-        if (!custom.includes(meta.tag)) { custom.push(meta.tag); localStorage.setItem(TAGS_KEY, JSON.stringify(custom)); }
-        populateTagSelect('modalTag', meta.tag);
-      }
-      flashField(tagSel);
-    }
-    if (meta.imageUrl) {
-      document.getElementById('modalImageUrl').value = meta.imageUrl;
-      flashField(document.getElementById('modalImageUrl'));
-    }
-    autoColorModalHeadline();
-    showToast('✓ Modal: Headline, Tag auto-filled!' + (meta.imageUrl ? ' Image भी मिली!' : ''));
-  }
+  // (extractFromUrl and modalExtractFromUrl are now handled by extractFromUrlGeneric above)
 
   async function modalSummarize() {
     const url = document.getElementById('modalArticleUrl').value.trim();
@@ -1651,22 +1552,8 @@
     try {
       let summary;
       if (modalFeedBody) {
-        // Use feed body directly — no URL scraping needed
-        const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-        if (!apiKey) { toggleKeyPanel(); throw new Error('API Key सेट नहीं — 🔑 बटन से key डालें'); }
         const bodyText = modalFeedBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-        const body = {
-          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-          messages: [{ role: 'user', content: 'You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n' + bodyText + '\n---\n\n' + getSummaryPrompt() }]
-        };
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-          body: JSON.stringify(body)
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message);
-        summary = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+        summary = await callClaude([{ role: 'user', content: 'You are an editorial assistant for Dainik Bhaskar, a Hindi news platform. Here is the full article text:\n\n---\n' + bodyText + '\n---\n\n' + getSummaryPrompt() }]);
         if (!summary) throw new Error('Summary नहीं मिली');
       } else {
         if (!url) { alert('E04: Article URL जरूरी है'); throw new Error('URL missing'); }
@@ -1794,25 +1681,16 @@
     if (!instruction) { showError('[E07] Instruction खाली है — नीचे box में लिखें'); return; }
     const current = document.getElementById('summaryText').innerText.trim();
     if (!current) { showError('[E06] Summary खाली है — पहले Summarize करें'); return; }
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
 
     document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=true);
     document.getElementById('loadingArea').style.display='block';
     hideError();
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 600,
-          messages: [{ role: 'user', content: `You are editing a Hindi news summary. Current summary:\n${current}\n\nInstruction: ${instruction}\n\nRules:\n- Keep simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
-        })
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+      const text = await callClaude(
+        [{ role: 'user', content: `You are editing a Hindi news summary. Current summary:\n${current}\n\nInstruction: ${instruction}\n\nRules:\n- Keep simple everyday Hindi\n${getSummaryRules()}` }],
+        { maxTokens: 600 }
+      );
       document.getElementById('summaryText').innerHTML = formatSummaryHTML(text);
       document.getElementById('customPromptInput').value = '';
       updateWordCount();
@@ -1921,8 +1799,6 @@
   async function regenSummary(bulletCount) {
     const url = document.getElementById('articleUrl').value.trim();
     if (!url) { showError('Article URL डालें'); return; }
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
 
     document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=true);
     document.getElementById('loadingArea').style.display='block';
@@ -1944,8 +1820,6 @@
   async function regenAction(action) {
     const current = document.getElementById('summaryText').innerText.trim();
     if (!current) { showError('[E06] Summary खाली है — पहले Summarize करें'); return; }
-    const apiKey = localStorage.getItem('ek_nazar_api_key') || '';
-    if (!apiKey) { toggleKeyPanel(); showError('[E08] API Key सेट नहीं — 🔑 बटन से key डालें'); return; }
 
     document.querySelectorAll('.regen-btn').forEach(b=>b.disabled=true);
     document.getElementById('loadingArea').style.display='block';
@@ -1956,18 +1830,10 @@
       : 'Make this summary more detailed and elaborative. Add more context and important details. Keep the same simple Hindi style. Max 7 bullets.';
 
     try {
-      const apiKey = localStorage.getItem('ek_nazar_api_key');
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 600,
-          messages: [{ role: 'user', content: `${instruction}\n\nCurrent summary:\n${current}\n\nRules:\n- Each bullet max 15 words\n- Start each bullet with •\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Only output bullet points, nothing else` }]
-        })
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+      const text = await callClaude(
+        [{ role: 'user', content: `${instruction}\n\nCurrent summary:\n${current}\n\nRules:\n${getSummaryRules()}` }],
+        { maxTokens: 600 }
+      );
       document.getElementById('summaryText').innerHTML = formatSummaryHTML(text);
       updateWordCount();
     } catch(e) {
@@ -1979,18 +1845,10 @@
   }
 
   async function callSummarizeWithCount(url, count) {
-    const apiKey = localStorage.getItem('ek_nazar_api_key');
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 800,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Read the article at: ${url}\n\nWrite exactly ${count} bullet points in Hindi.\n- Write like talking to a friend — simple everyday Hindi\n- Each bullet max 15 words\n- Bold key facts using **bold**\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Start each bullet with •\n- Only output bullet points, nothing else` }]
-      })
-    });
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    const text = await callClaude(
+      [{ role: 'user', content: `You are an editorial assistant for Dainik Bhaskar. Read the article at: ${url}\n\nWrite exactly ${count} bullet points in Hindi.\n${getSummaryRules()}` }],
+      { maxTokens: 800, tools: [{ type: 'web_search_20250305', name: 'web_search' }] }
+    );
     if (!text) throw new Error('Summary नहीं मिली');
     return text;
   }
@@ -2162,10 +2020,7 @@
     showToast('Metabase key saved ✓');
   }
 
-  // ── Summary Prompt Helper ──
-  function getSummaryPrompt() {
-    return `Write a Hindi news summary as bullet points. Requirements:\n- Write like you are telling a friend what happened — simple, everyday spoken Hindi\n- Avoid formal, literary or legal Hindi words. Use the simplest word possible\n- Example: use 'इजाजत' not 'अनुमति', 'मौत' not 'निधन', 'बच्चा' not 'शिशु'\n- Use 3 to 10 bullet points depending on how much important context the story has\n- Each bullet must be short — maximum 15 words\n- Each bullet = one crisp fact only\n- Cover: what happened, who, key numbers, impact\n- No long explanations, no background history\n- No opinions\n- Max 10 bullets, minimum 3\n- Bold key facts, numbers, names, verdicts using **bold** — be generous with bolding\n- Proper nouns in Hindi: सुप्रीम कोर्ट, हाई कोर्ट, दिल्ली, मुंबई etc. Abbreviations like AIIMS, BJP, CBI stay in English\n- Always use Arabic numerals (3, 5, 100) — never Devanagari numerals (३, ५, १००)\n- For difficult technical, medical or legal English terms only, write as: हिंदी-उच्चारण (हिंदी-अर्थ) — example: यूथेनेसिया (इच्छामृत्यु), क्वाड्रिप्लेजिया (हाथ-पैर काम न करना). Common English words Hindi readers understand — use as-is\n- Each bullet on a new line starting with •\n- Only output the bullet points, nothing else`;
-  }
+  // (getSummaryPrompt and getSummaryRules are defined at the top of the script)
 
   // ── Fetch from Metabase ──
   async function fetchArticleFeed() {

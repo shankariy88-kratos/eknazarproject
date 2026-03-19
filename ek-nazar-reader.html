@@ -209,12 +209,8 @@ var SLOT_ICONS = {
   'शाम': '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="4.5" fill="#E8913A"/><path d="M4 17h16" stroke="#D4500A" stroke-width="2" stroke-linecap="round"/><path d="M6 20h12" stroke="#D4500A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><rect x="8" y="13" width="3" height="4" rx="0.5" fill="#D4500A" opacity="0.6"/><rect x="12" y="11" width="3" height="6" rx="0.5" fill="#D4500A" opacity="0.6"/></svg>'
 };
 
-// Small icons for habit rows and timing pills
-var SLOT_ICONS_SM = {
-  'सुबह': SLOT_ICONS['सुबह'],
-  'दोपहर': SLOT_ICONS['दोपहर'],
-  'शाम': SLOT_ICONS['शाम']
-};
+// SLOT_ICONS_SM removed — just use SLOT_ICONS directly
+var SLOT_ICONS_SM = SLOT_ICONS;
 
 // Empty state illustrations (larger, with background)
 var EMPTY_STATE_ICONS = {
@@ -483,7 +479,7 @@ function goTo(idx, animate) {
 function updateCounter(c,t) {
   document.getElementById('cardCounter').textContent = t > 0 ? c + '/' + t : '—';
 }
-function updateProgress(c,t) { /* removed — counter pill is sufficient */ }
+function updateProgress() { /* no-op — counter pill is sufficient */ }
 
 // ── Swipe / Drag ──
 var txS=0, tyS=0, drag=false;
