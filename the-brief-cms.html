@@ -2034,13 +2034,7 @@
     document.getElementById('feedLoading').style.display = 'block';
     document.getElementById('feedList').innerHTML = '';
     try {
-      const resp = await fetch('https://metabase.dbdigital.in/api/card/247/query/json', {
-        method: 'POST',
-        headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
-      if (!resp.ok) throw new Error('HTTP ' + resp.status + ' — API key check करें');
-      feedArticles = await resp.json();
+      feedArticles = await fetchMetabaseWithCORS(apiKey);
       populateFeedCategoryFilter();
       renderFeedList(feedArticles);
     } catch(e) {
@@ -2048,6 +2042,62 @@
     } finally {
       document.getElementById('feedLoading').style.display = 'none';
     }
+  }
+
+  async function fetchMetabaseWithCORS(apiKey) {
+    const metabaseUrl = 'https://metabase.dbdigital.in/api/card/247/query/json';
+
+    // Tier 1: Direct fetch (works on localhost or if Metabase allows CORS)
+    try {
+      const resp = await fetch(metabaseUrl, {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        signal: AbortSignal.timeout(10000)
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+      throw new Error('Empty response');
+    } catch(e) {
+      console.log('Metabase direct fetch failed (CORS):', e.message);
+    }
+
+    // Tier 2: CORS proxy via allorigins
+    try {
+      const proxyUrl = 'https://api.allorigins.win/post?url=' + encodeURIComponent(metabaseUrl);
+      const resp2 = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'x-api-key=' + encodeURIComponent(apiKey),
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!resp2.ok) throw new Error('Proxy HTTP ' + resp2.status);
+      const proxyData = await resp2.json();
+      const parsed = JSON.parse(proxyData.contents);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      throw new Error('Empty proxy response');
+    } catch(e) {
+      console.log('Metabase proxy (allorigins POST) failed:', e.message);
+    }
+
+    // Tier 3: CORS proxy via corsproxy.io
+    try {
+      const resp3 = await fetch('https://corsproxy.io/?' + encodeURIComponent(metabaseUrl), {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!resp3.ok) throw new Error('HTTP ' + resp3.status);
+      const data3 = await resp3.json();
+      if (Array.isArray(data3) && data3.length > 0) return data3;
+      throw new Error('Empty response');
+    } catch(e) {
+      console.log('Metabase proxy (corsproxy.io) failed:', e.message);
+    }
+
+    throw new Error('Metabase से connect नहीं हो पाया — API key check करें या बाद में try करें');
   }
 
   function populateFeedCategoryFilter() {
