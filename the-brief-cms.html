@@ -1439,22 +1439,7 @@
     }
   }
 
-  function addModalBullet() {
-    const el = document.getElementById('modalSummaryText');
-    el.focus();
-    const div = document.createElement('div');
-    div.className = 'sum-bullet';
-    div.innerHTML = '• ';
-    const sel = window.getSelection();
-    if (sel.rangeCount) {
-      const range = sel.getRangeAt(0);
-      range.collapse(false);
-      range.insertNode(div);
-      range.setStartAfter(div); range.collapse(true);
-      sel.removeAllRanges(); sel.addRange(range);
-    } else { el.appendChild(div); }
-    updateModalWC();
-  }
+  function addModalBullet() { addBulletGeneric('modalSummaryText', updateModalWC); }
 
   async function modalRegenSummary(count) {
     const url = document.getElementById('modalArticleUrl').value.trim();
@@ -1737,15 +1722,33 @@
     }
   }
 
-  // ── Add blank bullet to summary ──
-  function addBullet() {
-    const el = document.getElementById('summaryText');
-    document.getElementById('summaryArea').style.display = 'block';
+  // ── Add/apply bullets to summary (works like Word: select text → click bullet → all lines get •) ──
+  function addBulletGeneric(elId, wcFn) {
+    const el = document.getElementById(elId);
+    const text = (el.innerText || '').trim();
+
+    // If there's existing text without bullets → convert all lines to bullets
+    if (text && !text.includes('•')) {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      el.innerHTML = lines.map(l => '<div class="sum-bullet">• ' + l + '</div>').join('');
+      wcFn();
+      el.focus();
+      // Place cursor at end
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return;
+    }
+
+    // Otherwise append a new empty bullet
+    if (elId === 'summaryText') document.getElementById('summaryArea').style.display = 'block';
     const newBullet = document.createElement('div');
     newBullet.className = 'sum-bullet';
-    newBullet.textContent = '• ';
+    newBullet.innerHTML = '• ';
     el.appendChild(newBullet);
-    // Place cursor at end of new bullet
     el.focus();
     const range = document.createRange();
     const sel = window.getSelection();
@@ -1753,43 +1756,52 @@
     range.collapse(true);
     sel.removeAllRanges();
     sel.addRange(range);
-    updateWordCount();
+    wcFn();
   }
+
+  function addBullet() { addBulletGeneric('summaryText', updateWordCount); }
 
   // ── Sanitize summary HTML on save: normalize any input to clean bullet divs ──
   function sanitizeSummaryHTML(html) {
     if (!html || !html.trim()) return '';
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    // Extract bullet texts — walk all child nodes, handle divs, spans, br-separated text
-    const bullets = [];
-    // Strategy: get innerText, split by newlines, find lines starting with •
-    const lines = (tmp.innerText || tmp.textContent || '').split('\n');
-    lines.forEach(line => {
-      const trimmed = line.trim();
-      if (!trimmed) return;
-      // Strip leading • and whitespace
-      const clean = trimmed.replace(/^•\s*/, '').trim();
-      if (clean) bullets.push(clean);
-    });
-    if (!bullets.length) return html; // fallback: return as-is
-    // Rebuild as clean divs, preserving bold from original HTML
-    // Re-parse original to extract bold per bullet
+
+    // Helper: strip foreign tags but keep <strong>/<b>/<em>/<i>
+    function cleanInlineHTML(h) {
+      return h.replace(/<(?!\/?(strong|b|em|i)\b)[^>]*>/gi, '');
+    }
+
     const result = [];
-    bullets.forEach(bulletText => {
-      // Find this bullet's HTML in original to preserve <strong>/<b> tags
-      let bulletHtml = bulletText;
-      tmp.querySelectorAll('div, span, p').forEach(node => {
-        const nodeText = (node.textContent || '').replace(/^•\s*/, '').trim();
-        if (nodeText === bulletText && node.innerHTML) {
-          bulletHtml = node.innerHTML.replace(/^•\s*/, '').trim();
-        }
+
+    // Strategy 1: Walk child divs/p elements (from contenteditable or formatSummaryHTML)
+    const blockNodes = tmp.querySelectorAll('div, p');
+    if (blockNodes.length) {
+      blockNodes.forEach(node => {
+        // Skip nested containers (only process leaf blocks)
+        if (node.querySelector('div, p')) return;
+        let inner = node.innerHTML || '';
+        // Strip leading bullet char
+        inner = inner.replace(/^•\s*/, '').trim();
+        // Clean foreign tags, keep bold/italic
+        inner = cleanInlineHTML(inner);
+        if (inner) result.push('<div class="sum-bullet">• ' + inner + '</div>');
       });
-      // Strip any foreign styles (font-family, font-size, color from paste) but keep <strong>/<b>/<em>/<i>
-      bulletHtml = bulletHtml.replace(/<(?!\/?(strong|b|em|i)\b)[^>]*>/gi, '').trim();
-      result.push('<div class="sum-bullet">• ' + bulletHtml + '</div>');
-    });
-    return result.join('');
+    }
+
+    // Strategy 2: If no block nodes found (plain text with <br> or bare text)
+    if (!result.length) {
+      // Split by <br> tags first, then by newlines
+      const rawHtml = tmp.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+      const lines = rawHtml.split('\n');
+      lines.forEach(line => {
+        let cleaned = line.replace(/^•\s*/, '').trim();
+        cleaned = cleanInlineHTML(cleaned);
+        if (cleaned) result.push('<div class="sum-bullet">• ' + cleaned + '</div>');
+      });
+    }
+
+    return result.length ? result.join('') : html; // fallback: return as-is
   }
 
   // ── Format summary: convert **bold** to <strong> and • to bullet lines ──
