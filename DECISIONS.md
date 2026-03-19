@@ -25,7 +25,32 @@ Each Metabase article body is 10-50KB of raw HTML. Storing it per story in local
 The headline auto-color (text before ":" gets tag color) used to run on every `onblur`. This destroyed manual color edits from the toolbar. Now it only runs on Extract prefill and tag dropdown change — after that, the user owns the styling.
 
 ## Why 3-tier CORS proxy for Metabase
-Metabase server doesn't have CORS headers for GitHub Pages. Direct fetch works on localhost (same network). For GitHub Pages, we fall through: Tier 1 (direct) → Tier 2 (allorigins.win) → Tier 3 (corsproxy.io). This avoids needing server-side changes for the demo.
+Metabase server (`metabase.dbdigital.in`) doesn't have CORS headers for external origins. Direct fetch works on localhost (same network). From GitHub Pages (`shankariy88-kratos.github.io`), the browser blocks the request with:
+```
+Access-Control-Allow-Origin header missing → CORS error
+```
+
+**Original ask to server team (not needed anymore):**
+```
+Access-Control-Allow-Origin: https://shankariy88-kratos.github.io
+Access-Control-Allow-Methods: POST, OPTIONS
+Access-Control-Allow-Headers: x-api-key, Content-Type
+```
+
+**Instead, we use 3-tier proxy fallback in `fetchMetabaseWithCORS()`:**
+- **Tier 1: Direct fetch** — `fetch(metabaseUrl, {headers: {'x-api-key': key}})`. Works on localhost. Fails on GitHub Pages (CORS).
+- **Tier 2: allorigins.win** — `fetch('https://api.allorigins.win/post?url=' + encodeURIComponent(metabaseUrl))`. Free public CORS proxy. Relays the POST request. This is what makes GitHub Pages work.
+- **Tier 3: corsproxy.io** — `fetch('https://corsproxy.io/?' + encodeURIComponent(metabaseUrl))`. Second fallback if allorigins is down.
+
+**Verified on 20 March 2026:** Opened `the-brief-cms.html` on GitHub Pages in Chrome, clicked Article Feed → Refresh. Tier 1 failed (CORS), Tier 2 (allorigins.win) succeeded. Articles loaded. No server-side changes needed.
+
+**Trade-offs:**
+- allorigins.win and corsproxy.io are free public services — they can go down, rate-limit, or shut down
+- For production, either add CORS headers on Metabase or deploy a dedicated proxy
+- For demo/POC this is sufficient and avoids any dependency on the server team
+
+## Why allorigins.win is also used for article HTML fetching
+The same CORS problem applies when fetching Bhaskar article HTML for Extract and AI Summarize. `fetchArticleHtml()` uses allorigins.win (`/get` and `/raw` endpoints) to proxy the article page. If Cloudflare blocks it, the code falls back to Claude's `web_search` tool (Tier 2 for summarize, Tier 2 for extract).
 
 ## Why sanitizeSummaryHTML() exists
 Manual typing and clipboard paste produce inconsistent HTML — foreign fonts, random spans, `<br>` instead of `<div>`, no bullet markers. `sanitizeSummaryHTML()` normalizes everything on save to clean `<div class="sum-bullet">• text</div>` with only bold/italic preserved. This ensures the reader renders all summaries identically.
