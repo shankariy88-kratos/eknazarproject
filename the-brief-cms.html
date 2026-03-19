@@ -336,7 +336,7 @@
             <button class="ct-color" style="background:#1e3a6e;" onclick="applyHeadlineColor('#1e3a6e')" title="Navy Blue"></button>
             <button class="ct-reset" onclick="applyHeadlineColor('')" title="Reset color">✕ Reset</button>
           </div>
-          <div id="storyHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..." onpaste="pastePlain(event, this)" onblur="autoColorHeadline()"></div>
+          <div id="storyHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..." onpaste="pastePlain(event, this)"></div>
         </div>
       </div>
 
@@ -544,7 +544,7 @@
             <button class="ct-color" style="background:#1e3a6e;" onclick="applyModalHeadlineColor('#1e3a6e')" title="Navy Blue"></button>
             <button class="ct-reset" onclick="applyModalHeadlineColor('')" title="Reset color">✕ Reset</button>
           </div>
-          <div id="modalHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..." onpaste="pastePlain(event, this)" onblur="autoColorModalHeadline()"></div>
+          <div id="modalHeadline" contenteditable="true" class="headline-editable" data-placeholder="खबर की हेडलाइन यहाँ लिखें..." onpaste="pastePlain(event, this)"></div>
         </div>
       </div>
 
@@ -1788,9 +1788,8 @@
   }
 
   // ── Auto-color headline: text before ":" gets tag color ──
-  function autoColorHeadline() {
-    const tag = document.getElementById('storyTag').value;
-    const hEl = document.getElementById('storyHeadline');
+  // Only applies on prefill (Extract) or tag change — NOT on blur, so user edits are preserved
+  function autoColorGeneric(hEl, tag) {
     const rawText = hEl.innerText.trim();
     if (!tag || tag === '__new__' || !rawText.includes(':')) return;
     const color = getTagColor(tag);
@@ -1800,19 +1799,8 @@
     const after = rawText.substring(colonIdx + 1);
     hEl.innerHTML = '<span style="color:' + color + '">' + before + ':</span>' + after;
   }
-
-  function autoColorModalHeadline() {
-    const tag = document.getElementById('modalTag').value;
-    const hEl = document.getElementById('modalHeadline');
-    const rawText = hEl.innerText.trim();
-    if (!tag || tag === '__new__' || !rawText.includes(':')) return;
-    const color = getTagColor(tag);
-    if (color === '#888') return;
-    const colonIdx = rawText.indexOf(':');
-    const before = rawText.substring(0, colonIdx);
-    const after = rawText.substring(colonIdx + 1);
-    hEl.innerHTML = '<span style="color:' + color + '">' + before + ':</span>' + after;
-  }
+  function autoColorHeadline() { autoColorGeneric(document.getElementById('storyHeadline'), document.getElementById('storyTag').value); }
+  function autoColorModalHeadline() { autoColorGeneric(document.getElementById('modalHeadline'), document.getElementById('modalTag').value); }
 
   // ── Regen summary ──
   async function regenSummary(bulletCount) {
