@@ -1344,7 +1344,10 @@
     document.getElementById('mRadioLabelManual').style.color = isAI ? 'var(--muted)' : '#fff';
     document.getElementById('mAiModeRow').style.display = isAI ? 'flex' : 'none';
     document.getElementById('modalSummaryModeLabel').textContent = isAI ? '✦ Claude द्वारा जनरेटेड' : '✍ खुद लिखा गया';
-    if (!isAI && document.getElementById('modalSummaryText').innerHTML.trim()==='') addModalBullet();
+    if (!isAI) {
+      document.getElementById('modalSummarySection').style.display = 'block';
+      if (document.getElementById('modalSummaryText').innerHTML.trim()==='') addModalBullet();
+    }
   }
 
   function addModalBullet() {
