@@ -1302,7 +1302,9 @@
       const dateFormatted=new Date(date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
       const label=isToday?'Today ('+dateFormatted+')':isYest?'Yesterday ('+dateFormatted+')':dateFormatted;
       const rows = byDate[date].map(b => {
-        const savedTime = new Date(b.savedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+        const savedDt = new Date(b.savedAt);
+        const savedTime = savedDt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+        const savedDateStr = savedDt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
         const cardRows = b.stories.map((s,i)=>renderStoryCard(s,i,b.stories.length,'history',b.id)).join('');
         return `
           <div class="history-bundle" id="hbundle-${b.id}">
@@ -1310,7 +1312,7 @@
               <div class="hb-slot">${b.slot}</div>
               <div class="hb-meta">
                 <div class="hb-title">${b.stories.length} stories</div>
-                <div class="hb-sub">Saved at ${savedTime}</div>
+                <div class="hb-sub">Saved ${savedDateStr} ${savedTime}</div>
               </div>
               <div class="hb-header-actions" onclick="event.stopPropagation()">
                 <button class="hb-btn" onclick="toggleExpand('${b.id}')">▾ Stories</button>
@@ -2229,13 +2231,18 @@
       const today = localDateStr();
       const yesterday = localDateStr(new Date(Date.now() - 86400000));
       listDiv.innerHTML = sorted.map((b, i) => {
-        const isToday = b.date === today;
-        const isYest = b.date === yesterday;
-        const dateStr = new Date(b.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-        const dateLabel = isToday ? 'Today (' + dateStr + ')' : isYest ? 'Yesterday (' + dateStr + ')' : dateStr;
+        // Use savedAt as single source of truth for display (b.date can be stale)
+        const savedDt = b.savedAt ? new Date(b.savedAt) : null;
+        const savedDateStr = savedDt ? localDateStr(savedDt) : b.date;
+        const isToday = savedDateStr === today;
+        const isYest = savedDateStr === yesterday;
+        const formattedDate = savedDt
+          ? savedDt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+          : new Date(b.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const dateLabel = isToday ? 'Today (' + formattedDate + ')' : isYest ? 'Yesterday (' + formattedDate + ')' : formattedDate;
         const slotLabel = b.slot || 'सुबह';
         const storyCount = (b.stories || []).length;
-        const savedTime = b.savedAt ? new Date(b.savedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+        const savedTime = savedDt ? savedDt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
         return '<button onclick="feedAddToExisting(' + i + ')" style="width:100%;padding:12px 14px;background:none;border:none;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:\'Noto Sans Devanagari\',sans-serif;text-align:left;" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'none\'">' +
           '<div>' +
             '<span style="font-weight:600;font-size:13px;color:var(--text);">' + dateLabel + '</span>' +
