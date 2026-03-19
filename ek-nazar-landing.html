@@ -96,7 +96,7 @@
   function updateHint() {
     try {
       const all = JSON.parse(localStorage.getItem('ek_nazar_bundles') || '[]');
-      const today = new Date().toISOString().split('T')[0];
+      const d = new Date(); const today = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const todayCount = all.filter(b => b.date === today).reduce((a,b) => a+b.stories.length, 0);
       document.getElementById('hintText').textContent = todayCount
         ? `आज की ${todayCount} खबरें तैयार हैं`

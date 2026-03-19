@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ek Nazar — Editorial CMS v3.8.9</title>
+<title>Ek Nazar — Editorial CMS v3.9.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -704,7 +704,7 @@
   // { mode: 'history-edit', bundleId, storyIdx }
   // { mode: 'history-add', bundleId }
 
-  document.getElementById('storyDate').valueAsDate = new Date();
+  document.getElementById('storyDate').value = localDateStr();
 
   // ── View ──
   function switchView(v) {
@@ -1228,6 +1228,7 @@
       savedAt: new Date().toISOString(),
       stories: stories.map(s=>({ tag:s.tag, headline:s.headline, summary:s.summary,
         imageUrl:s.imageUrl, videoUrl:s.videoUrl, articleUrl:s.articleUrl, deepLink:s.deepLink }))
+      // Note: feedBody intentionally excluded — it bloats localStorage (10-50KB per story)
     };
     const all = loadAllBundles(); all.push(bundle);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
@@ -1360,7 +1361,7 @@
       const btn=document.getElementById('hcopy-'+id);
       btn.textContent='✓ Copied!'; btn.classList.add('copied');
       setTimeout(()=>{btn.textContent='Copy JSON';btn.classList.remove('copied');},2000);
-    });
+    }).catch(()=> showToast('Copy failed — HTTPS required'));
   }
 
   function confirmDeleteBundle(id) {
@@ -1452,7 +1453,7 @@
         const curText = tmp.textContent;
         result = await callSummarizeWithInstruction(url, instruction, curText);
       } else {
-        result = await callSummarize(url, instruction);
+        result = await callSummarizeWithInstruction(url, instruction, null);
       }
       document.getElementById('modalSummaryText').innerHTML = formatSummaryHTML(result);
       document.getElementById('modalSummarySection').style.display = 'block';
@@ -1644,7 +1645,7 @@
       const btn=document.getElementById('copyBtn');
       btn.textContent='✓ Copied!'; btn.classList.add('copied');
       setTimeout(()=>{btn.textContent='Copy JSON';btn.classList.remove('copied');},2000);
-    });
+    }).catch(()=> showToast('Copy failed — HTTPS required'));
   }
 
   // ── Summarize button label ──
@@ -2008,7 +2009,7 @@
 
   updateKeyStatus();
   populateTagSelect('storyTag');
-  document.getElementById('feedDateFilter').valueAsDate = new Date(); // default to today
+  document.getElementById('feedDateFilter').value = localDateStr(); // default to today (local, not UTC)
   var mk = localStorage.getItem('ek_nazar_metabase_key');
   if (mk) document.getElementById('metabaseKeyInput').value = mk;
 
@@ -2279,8 +2280,8 @@
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
           articleUrl: a.ARTICLE_URL || '',
-          deepLink: a.ARTICLE_DEEPLINK || '',
-          feedBody: a.BODY || ''
+          deepLink: a.ARTICLE_DEEPLINK || ''
+          // feedBody excluded — goes straight to localStorage, would bloat it
         });
       });
     } else {
@@ -2293,8 +2294,8 @@
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
           articleUrl: a.ARTICLE_URL || '',
-          deepLink: a.ARTICLE_DEEPLINK || '',
-          feedBody: a.BODY || ''
+          deepLink: a.ARTICLE_DEEPLINK || ''
+          // feedBody excluded — goes straight to localStorage, would bloat it
         });
       }
     }

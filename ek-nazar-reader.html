@@ -219,7 +219,7 @@ var EMPTY_STATE_ICONS = {
   'शाम': '<svg viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#FBE9E7"/><circle cx="32" cy="24" r="11" fill="#E8913A"/><path d="M10 42h44" stroke="#D4500A" stroke-width="3" stroke-linecap="round"/><path d="M16 50h32" stroke="#D4500A" stroke-width="2" stroke-linecap="round" opacity="0.5"/><rect x="20" y="32" width="7" height="10" rx="1" fill="#D4500A" opacity="0.6"/><rect x="30" y="28" width="7" height="14" rx="1" fill="#D4500A" opacity="0.6"/><rect x="40" y="34" width="5" height="8" rx="1" fill="#D4500A" opacity="0.5"/></svg>'
 };
 
-function getToday() { return now.toISOString().split('T')[0]; }
+function getToday() { return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'); }
 function loadBundles() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; } }
 function getSlotBundle(slot) {
   var all = loadBundles().filter(function(b) { return b.date === getToday() && b.slot === slot; });
@@ -380,7 +380,7 @@ function buildCompletionCard() {
     var dotsHtml = '';
     for (var d = 0; d < 7; d++) {
       var dt = new Date(now.getTime() - (mondayOffset - d) * 86400000);
-      var dtStr = dt.toISOString().split('T')[0];
+      var dtStr = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
       var dayLabel = engDays[d];
       var bundles = loadBundles().filter(function(b) { return b.date === dtStr && b.slot === slot; });
       var isToday = (dtStr === today);
