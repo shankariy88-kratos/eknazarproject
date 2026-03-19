@@ -1299,7 +1299,8 @@
     const yesterday = localDateStr(new Date(Date.now()-86400000));
     container.innerHTML = sorted.map(date => {
       const isToday=date===today, isYest=date===yesterday;
-      const label=isToday?'Today':isYest?'Yesterday':new Date(date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+      const dateFormatted=new Date(date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+      const label=isToday?'Today ('+dateFormatted+')':isYest?'Yesterday ('+dateFormatted+')':dateFormatted;
       const rows = byDate[date].map(b => {
         const savedTime = new Date(b.savedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
         const cardRows = b.stories.map((s,i)=>renderStoryCard(s,i,b.stories.length,'history',b.id)).join('');
@@ -2230,7 +2231,8 @@
       listDiv.innerHTML = sorted.map((b, i) => {
         const isToday = b.date === today;
         const isYest = b.date === yesterday;
-        const dateLabel = isToday ? 'Today' : isYest ? 'Yesterday' : new Date(b.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const dateStr = new Date(b.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const dateLabel = isToday ? 'Today (' + dateStr + ')' : isYest ? 'Yesterday (' + dateStr + ')' : dateStr;
         const slotLabel = b.slot || 'सुबह';
         const storyCount = (b.stories || []).length;
         const savedTime = b.savedAt ? new Date(b.savedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
