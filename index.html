@@ -2215,7 +2215,7 @@
     document.getElementById('storyHeadline').innerHTML = a.TITLE || '';
     document.getElementById('articleUrl').value = a.ARTICLE_URL || '';
     document.getElementById('imageUrl').value = a.IMAGE_URL || '';
-    document.getElementById('deepLink').value = '';
+    document.getElementById('deepLink').value = a.ARTICLE_DEEPLINK || '';
 
     // Video
     const videoInput = document.getElementById('videoUrl');
@@ -2278,7 +2278,7 @@
         imageUrl: a.IMAGE_URL || '',
         videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
         articleUrl: a.ARTICLE_URL || '',
-        deepLink: ''
+        deepLink: a.ARTICLE_DEEPLINK || ''
       });
       added++;
     });
