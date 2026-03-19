@@ -461,6 +461,7 @@
       <select id="feedCategoryFilter" onchange="filterFeed()" style="padding:8px 12px;font-size:13px;">
         <option value="">All Categories</option>
       </select>
+      <button class="btn btn-ghost" id="feedSortBtn" onclick="toggleFeedSort()" style="padding:8px 14px;font-size:12px;">↓ Latest first</button>
       <button class="btn btn-primary" onclick="fetchArticleFeed()">🔄 Refresh</button>
     </div>
   </div>
@@ -599,6 +600,7 @@
   const STORAGE_KEY = 'ek_nazar_bundles';
   let feedArticles = [];
   let currentFeedBody = '';
+  let feedSortAsc = false; // false = latest first (default), true = oldest first
 
   const TAG_COLORS = {
     'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
@@ -2120,6 +2122,13 @@
     sel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => '<option value="' + c + '">' + c + '</option>').join('');
   }
 
+  function toggleFeedSort() {
+    feedSortAsc = !feedSortAsc;
+    const btn = document.getElementById('feedSortBtn');
+    btn.textContent = feedSortAsc ? '↑ Oldest first' : '↓ Latest first';
+    filterFeed();
+  }
+
   function filterFeed() {
     const search = (document.getElementById('feedSearch').value || '').toLowerCase();
     const cat = document.getElementById('feedCategoryFilter').value;
@@ -2127,6 +2136,12 @@
       if (cat && a.CATEGORY !== cat) return false;
       if (search && !(a.TITLE || '').toLowerCase().includes(search)) return false;
       return true;
+    });
+    // Sort by PUBLISHED_TIME
+    filtered.sort((a, b) => {
+      const tA = a.PUBLISHED_TIME || '';
+      const tB = b.PUBLISHED_TIME || '';
+      return feedSortAsc ? tA.localeCompare(tB) : tB.localeCompare(tA);
     });
     renderFeedList(filtered);
   }
