@@ -1225,9 +1225,11 @@
   }
   function persistBundles(all) { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
 
+  function localDateStr(d) { const o = d || new Date(); return o.getFullYear() + '-' + String(o.getMonth()+1).padStart(2,'0') + '-' + String(o.getDate()).padStart(2,'0'); }
+
   // ── History: render ──
   function renderHistory() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateStr();
     const datePicker = document.getElementById('historyDateFilter');
     if (datePicker && !datePicker.value) datePicker.value = today;
     const filterDate = datePicker ? datePicker.value : today;
@@ -1245,7 +1247,7 @@
     const byDate = {};
     all.forEach(b => { (byDate[b.date]=byDate[b.date]||[]).push(b); });
     const sorted = Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
-    const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+    const yesterday = localDateStr(new Date(Date.now()-86400000));
     container.innerHTML = sorted.map(date => {
       const isToday=date===today, isYest=date===yesterday;
       const label=isToday?'Today':isYest?'Yesterday':new Date(date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
@@ -2313,8 +2315,8 @@
         if (b.date !== a.date) return b.date.localeCompare(a.date);
         return (b.savedAt || '').localeCompare(a.savedAt || '');
       });
-      const today = new Date().toISOString().split('T')[0];
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      const today = localDateStr();
+      const yesterday = localDateStr(new Date(Date.now() - 86400000));
       listDiv.innerHTML = sorted.map((b, i) => {
         const isToday = b.date === today;
         const isYest = b.date === yesterday;
