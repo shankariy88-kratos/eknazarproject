@@ -1146,7 +1146,7 @@
     const deepLinkVal = document.getElementById('deepLink').value.trim() || articleUrlVal;
     stories.push({ id: Date.now(), tag,
       headline: headlineHTML,
-      summary: summaryHTML,
+      summary: sanitizeSummaryHTML(summaryHTML),
       imageUrl:   imageUrlVal,
       videoUrl:   videoUrlVal,
       articleUrl: articleUrlVal,
@@ -1624,7 +1624,7 @@
     const videoUrl = document.getElementById('modalVideoUrl').value.trim();
     const articleUrl = document.getElementById('modalArticleUrl').value.trim();
     const deepLink = document.getElementById('modalDeepLink').value.trim() || articleUrl;
-    const storyData = { tag, headline, summary, deepLink, articleUrl, imageUrl, videoUrl };
+    const storyData = { tag, headline, summary: sanitizeSummaryHTML(summary), deepLink, articleUrl, imageUrl, videoUrl };
 
     if (ctx.mode === 'live-edit') {
       const s = stories.find(s => s.id === ctx.storyId);
@@ -1754,6 +1754,42 @@
     sel.removeAllRanges();
     sel.addRange(range);
     updateWordCount();
+  }
+
+  // ── Sanitize summary HTML on save: normalize any input to clean bullet divs ──
+  function sanitizeSummaryHTML(html) {
+    if (!html || !html.trim()) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Extract bullet texts — walk all child nodes, handle divs, spans, br-separated text
+    const bullets = [];
+    // Strategy: get innerText, split by newlines, find lines starting with •
+    const lines = (tmp.innerText || tmp.textContent || '').split('\n');
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      // Strip leading • and whitespace
+      const clean = trimmed.replace(/^•\s*/, '').trim();
+      if (clean) bullets.push(clean);
+    });
+    if (!bullets.length) return html; // fallback: return as-is
+    // Rebuild as clean divs, preserving bold from original HTML
+    // Re-parse original to extract bold per bullet
+    const result = [];
+    bullets.forEach(bulletText => {
+      // Find this bullet's HTML in original to preserve <strong>/<b> tags
+      let bulletHtml = bulletText;
+      tmp.querySelectorAll('div, span, p').forEach(node => {
+        const nodeText = (node.textContent || '').replace(/^•\s*/, '').trim();
+        if (nodeText === bulletText && node.innerHTML) {
+          bulletHtml = node.innerHTML.replace(/^•\s*/, '').trim();
+        }
+      });
+      // Strip any foreign styles (font-family, font-size, color from paste) but keep <strong>/<b>/<em>/<i>
+      bulletHtml = bulletHtml.replace(/<(?!\/?(strong|b|em|i)\b)[^>]*>/gi, '').trim();
+      result.push('<div class="sum-bullet">• ' + bulletHtml + '</div>');
+    });
+    return result.join('');
   }
 
   // ── Format summary: convert **bold** to <strong> and • to bullet lines ──
