@@ -256,9 +256,9 @@
   <div class="header-left">
     <div class="logo">Ek Nazar <span>Editorial CMS</span></div>
     <nav class="nav-tabs">
-      <button class="nav-tab active" id="tab-editor" onclick="switchView('editor')">✏️ &nbsp;New Bundle</button>
-      <button class="nav-tab" id="tab-history" onclick="switchView('history')">📋 &nbsp;History</button>
-      <button class="nav-tab" id="tab-feed" onclick="switchView('feed')">📡 &nbsp;Article Feed</button>
+      <button class="nav-tab active" id="tab-editor" onclick="switchView('editor')">New Bundle</button>
+      <button class="nav-tab" id="tab-history" onclick="switchView('history')">History</button>
+      <button class="nav-tab" id="tab-feed" onclick="switchView('feed')">Article Feed</button>
     </nav>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -2129,7 +2129,7 @@
     try {
       feedArticles = await fetchMetabaseWithCORS(apiKey);
       populateFeedCategoryFilter();
-      renderFeedList(feedArticles);
+      filterFeed();
     } catch(e) {
       document.getElementById('feedList').innerHTML = '<div class="error-msg">Feed fetch failed: ' + e.message + '</div>';
     } finally {
@@ -2233,7 +2233,9 @@
     }
     container.innerHTML = articles.map((a, i) => {
       const idx = feedArticles.indexOf(a);
-      const time = a.PUBLISHED_TIME ? new Date(a.PUBLISHED_TIME).toLocaleTimeString('hi-IN', {hour:'2-digit', minute:'2-digit'}) : '';
+      const pubDate = a.PUBLISHED_TIME ? new Date(a.PUBLISHED_TIME) : null;
+      const time = pubDate ? pubDate.toLocaleTimeString('hi-IN', {hour:'2-digit', minute:'2-digit'}) : '';
+      const date = pubDate ? pubDate.toLocaleDateString('hi-IN', {day:'numeric', month:'short'}) : '';
       const hasVideo = a.VIDEO_URL && a.VIDEO_URL !== 'null' && a.VIDEO_URL !== '';
       return '<div class="feed-row" onclick="toggleFeedSelect(this,' + idx + ')">' +
         '<input type="checkbox" class="feed-checkbox" data-idx="' + idx + '" onclick="event.stopPropagation();updateFeedSelectionCount()">' +
@@ -2241,6 +2243,7 @@
           '<div class="feed-title">' + (a.TITLE || 'No title') + '</div>' +
           '<div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">' +
             '<span class="feed-category" style="background:' + getTagColor(mapMetabaseCategory(a.CATEGORY)) + ';">' + (a.CATEGORY || '') + '</span>' +
+            (date ? '<span class="feed-time">📅 ' + date + '</span>' : '') +
             '<span class="feed-time">' + time + '</span>' +
             (a.CITY ? '<span class="feed-time">📍 ' + a.CITY + '</span>' : '') +
             (hasVideo ? '<span class="feed-time">🎬 Video</span>' : '') +
