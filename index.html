@@ -458,6 +458,7 @@
     <div style="font-size:18px;font-weight:700;">📡 Article Feed <span style="font-size:12px;color:var(--muted);font-weight:400;">from Metabase</span></div>
     <div style="display:flex;gap:10px;align-items:center;">
       <input type="text" id="feedSearch" placeholder="Search headlines..." oninput="filterFeed()" style="width:220px;padding:8px 12px;font-size:13px;">
+      <input type="date" id="feedDateFilter" onchange="filterFeed()" style="padding:8px 12px;font-size:13px;">
       <select id="feedCategoryFilter" onchange="filterFeed()" style="padding:8px 12px;font-size:13px;">
         <option value="">All Categories</option>
       </select>
@@ -2074,6 +2075,7 @@
 
   updateKeyStatus();
   populateTagSelect('storyTag');
+  document.getElementById('feedDateFilter').valueAsDate = new Date(); // default to today
   var mk = localStorage.getItem('ek_nazar_metabase_key');
   if (mk) document.getElementById('metabaseKeyInput').value = mk;
 
@@ -2182,9 +2184,11 @@
   function filterFeed() {
     const search = (document.getElementById('feedSearch').value || '').toLowerCase();
     const cat = document.getElementById('feedCategoryFilter').value;
+    const dateVal = document.getElementById('feedDateFilter').value; // YYYY-MM-DD or empty
     const filtered = feedArticles.filter(a => {
       if (cat && a.CATEGORY !== cat) return false;
       if (search && !(a.TITLE || '').toLowerCase().includes(search)) return false;
+      if (dateVal && (a.PUBLISHED_DATE || '').substring(0, 10) !== dateVal) return false;
       return true;
     });
     // Sort by PUBLISHED_TIME
