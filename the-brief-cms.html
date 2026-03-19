@@ -139,7 +139,7 @@
   .copy-btn.copied { border-color: var(--success); color: var(--success); }
 
   /* ── History view ── */
-  .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+  .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; flex-wrap: wrap; gap: 12px; }
   .history-header h2 { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 22px; color: var(--text); }
   .history-header h2 span { color: var(--accent); }
   .history-stats { display: flex; gap: 10px; }
@@ -447,7 +447,11 @@
 <div id="view-history">
   <div class="history-header">
     <h2>Bundle <span>History</span></h2>
-    <div class="history-stats" id="historyStats"></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <input type="date" id="historyDateFilter" onchange="renderHistory()" style="padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;font-family:'Noto Sans Devanagari',sans-serif;width:140px;">
+      <button onclick="clearHistoryDateFilter()" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">All (7 days)</button>
+      <div class="history-stats" id="historyStats" style="display:flex;gap:6px;"></div>
+    </div>
   </div>
   <div id="historyContent"></div>
 </div>
@@ -1223,18 +1227,30 @@
   function persistBundles(all) { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
 
   // ── History: render ──
+  function clearHistoryDateFilter() {
+    document.getElementById('historyDateFilter').value = '';
+    renderHistory();
+  }
   function renderHistory() {
     const today = new Date().toISOString().split('T')[0];
+    const filterDate = document.getElementById('historyDateFilter') ? document.getElementById('historyDateFilter').value : '';
     const all = loadAllBundles().filter(b => {
+      if (filterDate) return b.date === filterDate;
       const diff = (new Date(today)-new Date(b.date))/86400000;
       return diff>=0 && diff<=6;
     });
+    const statsLabel = filterDate
+      ? new Date(filterDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      : 'Last 7 days';
     document.getElementById('historyStats').innerHTML = `
-      <div class="stat-pill">Last 7 days: <strong>${all.length}</strong> bundles</div>
+      <div class="stat-pill">${statsLabel}: <strong>${all.length}</strong> bundles</div>
       <div class="stat-pill">Total stories: <strong>${all.reduce((a,b)=>a+b.stories.length,0)}</strong></div>`;
     const container = document.getElementById('historyContent');
+    const emptyMsg = filterDate
+      ? `इस तारीख़ (${statsLabel}) पर कोई bundle नहीं मिली।`
+      : 'पिछले 7 दिनों में कोई bundle save नहीं हुई।<br><br>New Bundle tab में bundle बनाएं और Save करें।';
     if (!all.length) {
-      container.innerHTML = `<div class="empty-history"><div class="icon">📭</div><div>पिछले 7 दिनों में कोई bundle save नहीं हुई।<br><br>New Bundle tab में bundle बनाएं और Save करें।</div></div>`;
+      container.innerHTML = `<div class="empty-history"><div class="icon">📭</div><div>${emptyMsg}</div></div>`;
       return;
     }
     const byDate = {};
