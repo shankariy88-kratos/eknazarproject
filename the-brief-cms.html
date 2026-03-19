@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ek Nazar — Editorial CMS v3.9.0</title>
+<title>Ek Nazar — Editorial CMS v3.9.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -714,8 +714,19 @@
     document.getElementById('tab-editor').classList.toggle('active', v === 'editor');
     document.getElementById('tab-history').classList.toggle('active', v === 'history');
     document.getElementById('tab-feed').classList.toggle('active', v === 'feed');
+    if (v === 'editor') refreshDateIfStale();
     if (v === 'history') renderHistory();
     if (v === 'feed' && !feedArticles.length) fetchArticleFeed();
+  }
+
+  // Auto-update date picker if it's showing a past date (e.g. CMS kept open overnight)
+  function refreshDateIfStale() {
+    const picker = document.getElementById('storyDate');
+    const today = localDateStr();
+    if (picker.value < today) {
+      picker.value = today;
+      showToast('📅 Date auto-updated to today (' + today + ')');
+    }
   }
 
   // ── Tag ──
@@ -1221,6 +1232,13 @@
   // ── Save bundle ──
   function saveBundle() {
     if (!stories.length) { showError('[E03] Bundle खाली है — कम से कम 1 story जोड़ें'); return; }
+    // Safety: warn if date picker is stale (CMS kept open past midnight)
+    const pickerDate = document.getElementById('storyDate').value;
+    const today = localDateStr();
+    if (pickerDate < today) {
+      if (!confirm('⚠️ Date picker "' + pickerDate + '" दिखा रहा है लेकिन आज "' + today + '" है।\n\nक्या आप आज की date (' + today + ') पर save करना चाहते हैं?')) return;
+      document.getElementById('storyDate').value = today;
+    }
     const bundle = {
       id: 'bundle_'+Date.now(),
       date: document.getElementById('storyDate').value,
