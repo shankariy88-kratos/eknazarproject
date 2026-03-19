@@ -1,6 +1,6 @@
 # Ek Nazar — Claude Code Instructions
 ## FIRST THING EVERY SESSION
-- At the start of every session, read CHANGELOG.md first to understand full project history.
+- At session start — read CLAUDE.md, CHANGELOG.md and DECISIONS.md before doing anything.
 ## CRITICAL RULES
 - NEVER save files to /tmp/ — that folder gets wiped on restart
 - ALWAYS save files to /Users/shankarganesh/ek-nazar-pipeline/
