@@ -520,6 +520,12 @@
       <div class="form-group full">
         <label>Tag / Category</label>
         <select id="modalTag" class="modal-tag-select" onchange="handleModalTagChange(this)"></select>
+        <div id="modalCustomTagRow" style="display:none;flex-direction:column;gap:6px;margin-top:8px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="modalCustomTagInput" placeholder="नया टैग लिखें...">
+            <button class="btn btn-primary" style="padding:9px 13px;font-size:12px;" onclick="saveModalCustomTag()">जोड़ें</button>
+          </div>
+        </div>
       </div>
 
       <!-- Headline with color toolbar -->
@@ -695,6 +701,23 @@
   }
 
   function handleModalTagChange(sel) {
+    const row = document.getElementById('modalCustomTagRow');
+    row.style.display = sel.value === '__new__' ? 'flex' : 'none';
+    if (sel.value === '__new__') document.getElementById('modalCustomTagInput').focus();
+    else autoColorModalHeadline();
+  }
+
+  function saveModalCustomTag() {
+    const input = document.getElementById('modalCustomTagInput');
+    const val = input.value.trim(); if (!val) return;
+    const custom = loadCustomTags();
+    if (!custom.includes(val) && !DEFAULT_TAGS.includes(val)) {
+      custom.push(val);
+      localStorage.setItem(TAGS_KEY, JSON.stringify(custom));
+    }
+    populateTagSelect('modalTag', val);
+    document.getElementById('modalCustomTagRow').style.display = 'none';
+    input.value = '';
     autoColorModalHeadline();
   }
 
@@ -1648,7 +1671,8 @@
     if (!headlineText) { alert('E01: Headline जरूरी है'); headlineEl.focus(); return; }
     if (!summaryText) { alert('E02: Summary जरूरी है'); summaryEl.focus(); return; }
 
-    const tag = document.getElementById('modalTag').value;
+    const tagSel = document.getElementById('modalTag');
+    const tag = tagSel.value === '__new__' ? (document.getElementById('modalCustomTagInput').value.trim() || '') : tagSel.value;
     if (!tag) { alert('E09: Tag/Category जरूरी है'); return; }
     const imageUrl = document.getElementById('modalImageUrl').value.trim();
     const videoUrl = document.getElementById('modalVideoUrl').value.trim();
