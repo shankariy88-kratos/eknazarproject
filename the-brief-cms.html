@@ -1328,6 +1328,7 @@
                 <div class="hb-sub">Saved ${savedDateStr} ${savedTime}</div>
               </div>
               <div class="hb-header-actions" onclick="event.stopPropagation()">
+                <button class="hb-btn" onclick="openHistoryCardPreview('${b.id}')">📱 Preview</button>
                 <button class="hb-btn" onclick="toggleExpand('${b.id}')">▾ Stories</button>
                 <button class="hb-btn" id="hcopy-${b.id}" onclick="copyHistoryBundle('${b.id}')">Copy JSON</button>
                 <button class="hb-btn danger" onclick="confirmDeleteBundle('${b.id}')">🗑 Bundle</button>
@@ -1924,12 +1925,26 @@
     return text;
   }
 
-  // ── Card Preview ──
+  // ── Card Preview (works for both live bundle and history bundles) ──
   let cpIdx = 0;
+  let cpStories = []; // stories to preview (live or history)
+  let cpSlot = ''; // slot label for preview
 
   function openCardPreview(idx) {
     if (!stories.length) { showError('[E03] Bundle खाली है — पहले story जोड़ें'); return; }
+    cpStories = stories;
+    cpSlot = (document.getElementById('slotBadge').textContent || 'दोपहर').trim();
     cpIdx = idx || 0;
+    document.getElementById('cardPreviewOverlay').style.display = 'flex';
+    renderCardPreview();
+  }
+
+  function openHistoryCardPreview(bundleId) {
+    const bundle = loadAllBundles().find(b => b.id === bundleId);
+    if (!bundle || !bundle.stories.length) { showToast('इस bundle में कोई story नहीं'); return; }
+    cpStories = bundle.stories;
+    cpSlot = bundle.slot || 'दोपहर';
+    cpIdx = 0;
     document.getElementById('cardPreviewOverlay').style.display = 'flex';
     renderCardPreview();
   }
@@ -1943,7 +1958,7 @@
   });
 
   function cardPreviewNav(dir) {
-    cpIdx = Math.max(0, Math.min(cpIdx + dir, stories.length - 1));
+    cpIdx = Math.max(0, Math.min(cpIdx + dir, cpStories.length - 1));
     renderCardPreview();
   }
 
@@ -1972,10 +1987,10 @@
   }
 
   function renderCardPreview() {
-    const s = stories[cpIdx];
+    const s = cpStories[cpIdx];
     if (!s) return;
-    const total = stories.length;
-    const slot = (document.getElementById('slotBadge').textContent || 'दोपहर').trim();
+    const total = cpStories.length;
+    const slot = cpSlot || 'दोपहर';
 
     // Topbar — slot label + date
     const slotTitles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
