@@ -1093,6 +1093,7 @@
     currentFeedBody = '';
     var feedBodySection = document.getElementById('feedBodySection');
     if (feedBodySection) feedBodySection.style.display = 'none';
+    updateSummarizeBtnLabel();
   }
 
   // ── Live bundle: render ──
@@ -1423,6 +1424,9 @@
     document.getElementById('modalExtractLoading').style.display = 'none';
     populateTagSelect('modalTag', story?.tag || DEFAULT_TAGS[0]);
     updateModalWC();
+    // Modal summarize button label — URL-based (modal doesn't have feed body context)
+    const modalSumBtn = document.getElementById('modalSumBtn');
+    if (modalSumBtn) modalSumBtn.textContent = '✦ Summarize from Article URL';
     document.getElementById('modalOverlay').classList.add('open');
     hl.focus();
   }
@@ -1626,6 +1630,16 @@
       btn.textContent='✓ Copied!'; btn.classList.add('copied');
       setTimeout(()=>{btn.textContent='Copy JSON';btn.classList.remove('copied');},2000);
     });
+  }
+
+  // ── Summarize button label ──
+  function updateSummarizeBtnLabel() {
+    const mainBtn = document.getElementById('summarizeBtn');
+    if (mainBtn) {
+      mainBtn.textContent = currentFeedBody
+        ? '✦ Summarize from Extracted Article Body'
+        : '✦ Summarize from Article URL';
+    }
   }
 
   // ── Utils ──
@@ -2225,6 +2239,9 @@
 
     // Auto-color headline
     if (typeof autoColorHeadline === 'function') autoColorHeadline();
+
+    // Update Summarize button label
+    updateSummarizeBtnLabel();
 
     showToast('✓ Article fields auto-filled from feed');
   }
