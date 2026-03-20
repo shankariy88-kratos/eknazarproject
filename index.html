@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ek Nazar — Editorial CMS v3.9.8</title>
+<title>Ek Nazar — Editorial CMS v3.9.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1239,19 +1239,34 @@
       if (!confirm('⚠️ Date picker "' + pickerDate + '" दिखा रहा है लेकिन आज "' + today + '" है।\n\nक्या आप आज की date (' + today + ') पर save करना चाहते हैं?')) return;
       document.getElementById('storyDate').value = today;
     }
-    const bundle = {
-      id: 'bundle_'+Date.now(),
-      date: document.getElementById('storyDate').value,
-      slot: document.getElementById('storySlot').value,
-      savedAt: new Date().toISOString(),
-      stories: stories.map(s=>({ tag:s.tag, headline:s.headline, summary:s.summary,
-        imageUrl:s.imageUrl, videoUrl:s.videoUrl, articleUrl:s.articleUrl, deepLink:s.deepLink }))
-      // Note: feedBody intentionally excluded — it bloats localStorage (10-50KB per story)
-    };
-    const all = loadAllBundles(); all.push(bundle);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    stories=[]; renderLiveBundle(); if (jsonVisible) updateJSON();
-    hideError(); showToast('✓ Bundle History में save हो गई!');
+    const bundleDate = document.getElementById('storyDate').value;
+    const bundleSlot = document.getElementById('storySlot').value;
+    const newStories = stories.map(s=>({ tag:s.tag, headline:s.headline, summary:s.summary,
+      imageUrl:s.imageUrl, videoUrl:s.videoUrl, articleUrl:s.articleUrl, deepLink:s.deepLink }));
+    // Note: feedBody intentionally excluded — it bloats localStorage (10-50KB per story)
+
+    const all = loadAllBundles();
+    // Enforce one bundle per date+slot — merge into existing if found
+    const existing = all.find(b => b.date === bundleDate && b.slot === bundleSlot);
+    if (existing) {
+      newStories.forEach(s => existing.stories.push(s));
+      existing.savedAt = new Date().toISOString(); // update timestamp
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      stories=[]; renderLiveBundle(); if (jsonVisible) updateJSON();
+      hideError(); showToast('✓ ' + newStories.length + ' stories existing "' + bundleSlot + '" bundle में merge हो गईं!');
+    } else {
+      const bundle = {
+        id: 'bundle_'+Date.now(),
+        date: bundleDate,
+        slot: bundleSlot,
+        savedAt: new Date().toISOString(),
+        stories: newStories
+      };
+      all.push(bundle);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      stories=[]; renderLiveBundle(); if (jsonVisible) updateJSON();
+      hideError(); showToast('✓ Bundle History में save हो गई!');
+    }
   }
 
   // ── localStorage ──
@@ -1271,15 +1286,6 @@
           // Strip feedBody from old bundles (bloats localStorage)
           if (s.feedBody) { delete s.feedBody; migrated = true; }
         });
-        // Fix stale date picker bug: correct b.date to match actual save date
-        if (b.savedAt && b.date) {
-          const savedLocal = localDateStr(new Date(b.savedAt));
-          if (b.date !== savedLocal) {
-            console.log('Migration: bundle', b.id, 'date corrected', b.date, '→', savedLocal);
-            b.date = savedLocal;
-            migrated = true;
-          }
-        }
       });
       if (migrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
       return all;
@@ -2416,6 +2422,7 @@
     if (!a) return;
 
     // Add story directly to the live bundle
+    const body = a.BODY || '';
     stories.push({
       id: Date.now() + Math.random(),
       tag: mapMetabaseCategory(a.CATEGORY),
@@ -2425,13 +2432,32 @@
       videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
       articleUrl: a.ARTICLE_URL || '',
       deepLink: a.ARTICLE_DEEPLINK || '',
-      feedBody: a.BODY || ''
+      feedBody: body
     });
+
+    // Set currentFeedBody so the main editor form shows the body preview
+    currentFeedBody = body;
+    if (body) {
+      const fbSection = document.getElementById('feedBodySection');
+      const fbPreview = document.getElementById('feedBodyPreview');
+      if (fbSection && fbPreview) {
+        fbPreview.textContent = body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        fbSection.style.display = 'block';
+      }
+    }
+
+    // Pre-fill the main form with article data
+    document.getElementById('articleUrl').value = a.ARTICLE_URL || '';
+    document.getElementById('deepLink').value = a.ARTICLE_DEEPLINK || a.ARTICLE_URL || '';
+    document.getElementById('imageUrl').value = a.IMAGE_URL || '';
+    const vidUrl = (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '';
+    document.getElementById('videoUrl').value = vidUrl;
 
     // Switch to editor and render
     switchView('editor');
     renderLiveBundle();
-    showToast('✓ Article bundle में जोड़ी गई — summary edit करें');
+    updateSummarizeBtnLabel();
+    showToast('✓ Article bundle में जोड़ी गई — Edit पर click करके summary लिखें');
   }
 
   // ── Add Selected to Bundle (bulk) ──
