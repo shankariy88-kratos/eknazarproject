@@ -122,9 +122,16 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 .habit-slot-label .tab-icon-sm svg { width: 16px; height: 16px; }
 .habit-dots { display: flex; gap: 4px; flex: 1; justify-content: flex-end; }
 .habit-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #bbb; flex-shrink: 0; background: #fafafa; }
-.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; }
+.habit-dot.done { background: #d4500a; border-color: #d4500a; color: #fff; font-size: 12px; cursor: pointer; }
+.habit-dot.done:active { background: #b8440a; transform: scale(0.9); }
 .habit-dot.today { border-color: #d4500a; color: #d4500a; font-weight: 700; }
-.habit-dot.missed { border-color: #d4500a; color: #d4500a; background: #fff; }
+.habit-dot.missed { border-color: #d4500a; color: #d4500a; background: #fff; cursor: pointer; }
+.habit-dot.missed:active { background: #fff3e0; transform: scale(0.9); }
+
+/* ── Back to Today pill ── */
+.back-today { display: none; background: #d4500a; color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; font-family: 'Noto Sans Devanagari', sans-serif; cursor: pointer; flex-shrink: 0; }
+.back-today.show { display: flex; align-items: center; gap: 4px; }
+.back-today:active { background: #b8440a; }
 .comp-timing { padding: 12px 16px; background: #fff; }
 .comp-timing-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
 .timing-row { display: flex; gap: 8px; }
@@ -150,6 +157,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
   <div class="topbar-center">
     <div class="topbar-title" id="topbarTitle">दोपहर की <span class="brand">एक नजर</span> <span class="date" id="topbarDate"></span></div>
   </div>
+  <button class="back-today" id="backToday" onclick="goBackToToday()">← आज</button>
   <div class="card-counter" id="cardCounter">—</div>
 </div>
 
@@ -191,6 +199,7 @@ var cards = [];
 var slotPositions = { 'सुबह': 0, 'दोपहर': 0, 'शाम': 0 };
 var slotCards = { 'सुबह': [], 'दोपहर': [], 'शाम': [] };
 var now = new Date();
+var viewingDate = null; // null = today, set to YYYY-MM-DD for historical
 
 var TAG_COLORS = {
   'राज्य-शहर':'#FF554B','बीकानेर':'#FF554B','राजस्थान':'#FF554B',
@@ -220,8 +229,10 @@ var EMPTY_STATE_ICONS = {
 
 function getToday() { return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'); }
 function loadBundles() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; } }
+function getActiveDate() { return viewingDate || getToday(); }
 function getSlotBundle(slot) {
-  var all = loadBundles().filter(function(b) { return b.date === getToday() && b.slot === slot; });
+  var targetDate = getActiveDate();
+  var all = loadBundles().filter(function(b) { return b.date === targetDate && b.slot === slot; });
   return all.sort(function(a,b) { return new Date(b.savedAt) - new Date(a.savedAt); })[0];
 }
 
@@ -356,7 +367,9 @@ function buildCompletionCard(slot) {
       var isCurrent = isToday && s === slot;
 
       if (isCurrent || isDone) {
-        dotsHtml += '<div class="habit-dot done">✓</div>';
+        dotsHtml += '<div class="habit-dot done" onclick="openHistoryBundle(\'' + dtStr + '\',\'' + s + '\')">✓</div>';
+      } else if (isToday && bundles.length > 0) {
+        dotsHtml += '<div class="habit-dot missed" onclick="openHistoryBundle(\'' + dtStr + '\',\'' + s + '\')">-</div>';
       } else if (isToday) {
         dotsHtml += '<div class="habit-dot missed">-</div>';
       } else {
@@ -408,6 +421,34 @@ function shareBundle() {
       if (btn) { btn.textContent = '✓ लिंक कॉपी हो गया!'; setTimeout(function() { btn.innerHTML = '📤 &nbsp;दोस्तों को शेयर करें'; }, 2000); }
     });
   }
+}
+
+// ── History navigation from habit grid ──
+function openHistoryBundle(dateStr, slot) {
+  viewingDate = dateStr;
+  // Reset positions for fresh view
+  slotPositions = { 'सुबह': 0, 'दोपहर': 0, 'शाम': 0 };
+  currentSlotIdx = SLOT_ORDER.indexOf(slot);
+  if (currentSlotIdx === -1) currentSlotIdx = 0;
+  currentSlot = SLOT_ORDER[currentSlotIdx];
+  renderAllSlots();
+  // Show back-to-today button
+  updateBackButton();
+}
+
+function goBackToToday() {
+  viewingDate = null;
+  slotPositions = { 'सुबह': 0, 'दोपहर': 0, 'शाम': 0 };
+  var hr = now.getHours();
+  currentSlotIdx = hr < 12 ? 0 : (hr < 17 ? 1 : 2);
+  currentSlot = SLOT_ORDER[currentSlotIdx];
+  renderAllSlots();
+  updateBackButton();
+}
+
+function updateBackButton() {
+  var btn = document.getElementById('backToday');
+  btn.classList.toggle('show', viewingDate !== null && viewingDate !== getToday());
 }
 
 // ── Render all 3 slots at once ──
@@ -477,9 +518,10 @@ function goToSlot(idx, animate) {
     t.classList.toggle('active', t.dataset.slot === currentSlot);
   });
 
-  // Update topbar title
+  // Update topbar title — show viewing date if historical
   var titles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
-  document.getElementById('topbarTitle').innerHTML = titles[currentSlot] + ' <span class="brand">एक नजर</span> <span class="date" id="topbarDate">(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')</span>';
+  var displayDate = viewingDate ? new Date(viewingDate + 'T12:00:00') : now;
+  document.getElementById('topbarTitle').innerHTML = titles[currentSlot] + ' <span class="brand">एक नजर</span> <span class="date" id="topbarDate">(' + displayDate.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')</span>';
 
   // Restore card position for this slot
   cards = slotCards[currentSlot];
