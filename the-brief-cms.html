@@ -2273,10 +2273,6 @@
     let title = (article.TITLE || '').trim();
     if (title.startsWith(':')) {
       title = title.substring(1).trim();
-      // Prepend CITY if available
-      if (article.CITY && article.CITY.trim()) {
-        title = article.CITY.trim() + ': ' + title;
-      }
     }
     return title;
   }
