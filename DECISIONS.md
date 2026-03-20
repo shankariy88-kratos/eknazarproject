@@ -70,5 +70,11 @@ Having two "20 Mar सुबह" bundles is confusing — the editor doesn't kno
 ## Why date migration was removed
 The aggressive migration that forced `b.date = savedAt` was causing bundles to move to wrong dates (e.g., a bundle intentionally saved for tomorrow). The stale date picker warning (`refreshDateIfStale()` + confirm dialog on save) is sufficient prevention. The editorial date (`b.date`) should be whatever the editor chose in the date picker.
 
+## Why reader uses vertical swipe for cards and horizontal for slots
+During demo, feedback was that vertical swipe (up = next) matches Dainik Bhaskar app UX. Users instinctively swipe up to read more. Horizontal swipe switches between slot contexts (सुबह/दोपहर/शाम). This maps to the 2D grid pattern: Instagram Reels (vertical = next content) + Instagram Stories (horizontal = next person). Architecture uses nested containers: outer `.slot-track` (horizontal translateX for slots) > inner `.card-track` per slot (vertical translateY for cards). Each slot remembers its card position independently.
+
+## Why all 3 slots are rendered at once
+Previously, switching slots called `renderCards()` which destroyed and rebuilt the DOM. This lost card position, caused layout flicker, and made slot switching feel heavy. Now `renderAllSlots()` renders all 3 slot panels upfront. Switching slots just moves the outer `translateX` — instant, smooth, and position-preserving. Trade-off: slightly more DOM nodes (3x), but typical story count is 5-10 per slot so impact is negligible.
+
 ## Why fixFeedTitle() strips leading colons
 Metabase TITLE column sometimes has the city/topic prefix missing, leaving titles like `: ठेकों की नीलामी...`. `fixFeedTitle()` strips the leading `:` and whitespace. Decision: don't prepend CITY — just clean up the colon. The editor can add location context via the tag system instead.

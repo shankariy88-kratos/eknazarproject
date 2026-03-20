@@ -16,13 +16,15 @@ Repo: github.com/shankariy88-kratos/eknazarproject
 - index.html — Editorial CMS (~144KB, v3.9.9) — the source of truth
 - DECISIONS.md — Why decisions were made
 - the-brief-cms.html — exact copy of index.html, served from GitHub Pages
-- ek-nazar-reader.html — Reader app (card swipe UI)
+- ek-nazar-reader.html — Reader app (vertical card swipe + horizontal slot swipe, v4.0.0)
 - ek-nazar-landing.html — Landing page
 - CHANGELOG.md — Full version history
 - package.json — Node.js config
 ## Stack
 Node.js, Claude API (Sonnet), Metabase API, localStorage bundles
 ## Architecture Notes
+- Reader uses 2D swipe: vertical (cards) + horizontal (slots) — like Reels + Stories
+- Reader DOM: .slot-track > 3x .slot-panel > .card-track (vertical) per slot
 - CMS and Reader share localStorage key `ek_nazar_bundles`
 - Metabase feed uses 3-tier CORS proxy (direct → allorigins → corsproxy.io)
 - callClaude() is the shared API helper — all AI calls go through it

@@ -1,5 +1,13 @@
 # Ek Nazar — Change Log
 
+## v4.0.0 — 20 March 2026 (Session 3)
+**Changed:** MAJOR — Reader swipe redesign: swipe UP/DOWN for cards, LEFT/RIGHT for slots
+**Architecture:** Nested DOM: .slot-track (horizontal translateX) > .slot-panel > .card-track (vertical translateY)
+**Added:** All 3 slots rendered at once — each remembers its card position when switching
+**Changed:** Desktop nav buttons from ←/→ to ▲/▼, keyboard arrows remapped (Up/Down=cards, Left/Right=slots)
+**Tested:** Mobile swipe, desktop drag, keyboard nav, slot tab clicks, completion card, empty states
+**Status:** Pushed to GitHub ✅
+
 ## v3.9.9 — 20 March 2026 (Session 2)
 **Fixed:** One bundle per date+slot — saveBundle() merges into existing, loadAllBundles() auto-merges duplicates
 **Fixed:** Removed aggressive date migration that forced b.date = savedAt (stale picker warning is sufficient)
