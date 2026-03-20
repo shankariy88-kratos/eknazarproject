@@ -2209,7 +2209,7 @@
     const dateVal = document.getElementById('feedDateFilter').value; // YYYY-MM-DD or empty
     const filtered = feedArticles.filter(a => {
       if (cat && a.CATEGORY !== cat) return false;
-      if (search && !(a.TITLE || '').toLowerCase().includes(search)) return false;
+      if (search && !fixFeedTitle(a).toLowerCase().includes(search)) return false;
       if (dateVal && (a.PUBLISHED_DATE || '').substring(0, 10) !== dateVal) return false;
       return true;
     });
@@ -2237,7 +2237,7 @@
       return '<div class="feed-row" onclick="toggleFeedSelect(this,' + idx + ')">' +
         '<input type="checkbox" class="feed-checkbox" data-idx="' + idx + '" onclick="event.stopPropagation();updateFeedSelectionCount()">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="feed-title">' + (a.TITLE || 'No title') + '</div>' +
+          '<div class="feed-title">' + (fixFeedTitle(a) || 'No title') + '</div>' +
           '<div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">' +
             '<span class="feed-category" style="background:' + getTagColor(mapMetabaseCategory(a.CATEGORY)) + ';">' + (a.CATEGORY || '') + '</span>' +
             (date ? '<span class="feed-time">📅 ' + date + '</span>' : '') +
@@ -2266,6 +2266,19 @@
     const actionsEl = document.getElementById('feedActions');
     if (countEl) countEl.textContent = checked.length + ' selected';
     if (actionsEl) actionsEl.style.display = checked.length > 0 ? 'flex' : 'none';
+  }
+
+  // ── Fix Metabase titles that start with ":" (prefix/city missing from TITLE column) ──
+  function fixFeedTitle(article) {
+    let title = (article.TITLE || '').trim();
+    if (title.startsWith(':')) {
+      title = title.substring(1).trim();
+      // Prepend CITY if available
+      if (article.CITY && article.CITY.trim()) {
+        title = article.CITY.trim() + ': ' + title;
+      }
+    }
+    return title;
   }
 
   // ── Category Mapping ──
@@ -2372,7 +2385,7 @@
         if (!a) return;
         articlesToAdd.push({
           tag: mapMetabaseCategory(a.CATEGORY),
-          headline: a.TITLE || '',
+          headline: fixFeedTitle(a),
           summary: '',
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
@@ -2386,7 +2399,7 @@
       if (a) {
         articlesToAdd.push({
           tag: mapMetabaseCategory(a.CATEGORY),
-          headline: a.TITLE || '',
+          headline: fixFeedTitle(a),
           summary: '',
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
@@ -2426,7 +2439,7 @@
     stories.push({
       id: Date.now() + Math.random(),
       tag: mapMetabaseCategory(a.CATEGORY),
-      headline: a.TITLE || '',
+      headline: fixFeedTitle(a),
       summary: '',
       imageUrl: a.IMAGE_URL || '',
       videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
@@ -2472,7 +2485,7 @@
       stories.push({
         id: Date.now() + Math.random(),
         tag: mapMetabaseCategory(a.CATEGORY),
-        headline: a.TITLE || '',
+        headline: fixFeedTitle(a),
         summary: '',
         imageUrl: a.IMAGE_URL || '',
         videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
