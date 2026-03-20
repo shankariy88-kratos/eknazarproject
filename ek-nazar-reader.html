@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>एक नज़र</title>
+<title>एक नजर</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── Reset ── */
@@ -148,7 +148,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
 <div class="topbar">
   <a class="back-btn" href="ek-nazar-landing.html">←</a>
   <div class="topbar-center">
-    <div class="topbar-title" id="topbarTitle">दोपहर की <span class="brand">एक नज़र</span> <span class="date" id="topbarDate"></span></div>
+    <div class="topbar-title" id="topbarTitle">दोपहर की <span class="brand">एक नजर</span> <span class="date" id="topbarDate"></span></div>
   </div>
   <div class="card-counter" id="cardCounter">—</div>
 </div>
@@ -316,7 +316,7 @@ function buildStoryCard(s) {
 
 // ── Build empty state for a slot ──
 function buildEmptyState(slot) {
-  var titles = { 'सुबह': 'सुबह की एक नज़र 7:00 AM पर अपलोड होगी', 'दोपहर': 'दोपहर की एक नज़र 2:00 PM पर अपलोड होगी', 'शाम': 'शाम की एक नज़र 7:00 PM पर अपलोड होगी' };
+  var titles = { 'सुबह': 'सुबह की एक नजर 7:00 AM पर अपलोड होगी', 'दोपहर': 'दोपहर की एक नजर 2:00 PM पर अपलोड होगी', 'शाम': 'शाम की एक नजर 7:00 PM पर अपलोड होगी' };
   return '<div class="state-screen"><div class="state-icon">' + EMPTY_STATE_ICONS[slot] + '</div><div class="state-title">' + titles[slot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
 }
 
@@ -388,7 +388,7 @@ function buildCompletionCard(slot) {
     '</div>' +
     '<div class="comp-divider"></div>' +
     '<div class="comp-timing">' +
-      '<div class="comp-timing-title">एक नज़र की टाइमिंग्स</div>' +
+      '<div class="comp-timing-title">एक नजर की टाइमिंग्स</div>' +
       '<div class="timing-row">' + timingHtml + '</div>' +
     '</div>' +
     '</div>' +
@@ -399,9 +399,9 @@ function buildCompletionCard(slot) {
 }
 
 function shareBundle() {
-  var text = 'एक नज़र — Dainik Bhaskar की ' + currentSlot + ' की खबरें पढ़ी मैंने। आप भी पढ़ें!';
+  var text = 'एक नजर — Dainik Bhaskar की ' + currentSlot + ' की खबरें पढ़ी मैंने। आप भी पढ़ें!';
   if (navigator.share) {
-    navigator.share({ title: 'एक नज़र', text: text, url: window.location.href });
+    navigator.share({ title: 'एक नजर', text: text, url: window.location.href });
   } else {
     navigator.clipboard.writeText(text + '\n' + window.location.href).then(function() {
       var btn = document.querySelector('.share-btn');
@@ -479,7 +479,7 @@ function goToSlot(idx, animate) {
 
   // Update topbar title
   var titles = { 'सुबह': 'सुबह की', 'दोपहर': 'दोपहर की', 'शाम': 'शाम की' };
-  document.getElementById('topbarTitle').innerHTML = titles[currentSlot] + ' <span class="brand">एक नज़र</span> <span class="date" id="topbarDate">(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')</span>';
+  document.getElementById('topbarTitle').innerHTML = titles[currentSlot] + ' <span class="brand">एक नजर</span> <span class="date" id="topbarDate">(' + now.toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) + ')</span>';
 
   // Restore card position for this slot
   cards = slotCards[currentSlot];
