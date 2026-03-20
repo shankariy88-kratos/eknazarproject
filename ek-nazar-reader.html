@@ -552,14 +552,42 @@ function updateCounter(c,t) {
   document.getElementById('cardCounter').textContent = t > 0 ? c + '/' + t : '—';
 }
 
+// ── Scroll boundary check ──
+// Only swipe to next/prev card when card body is at scroll boundary
+// If content is still scrollable in swipe direction, let native scroll handle it
+function getScrollableParent(el) {
+  while (el && el !== document.body) {
+    if (el.classList && (el.classList.contains('card-body') || el.classList.contains('comp-scroll'))) {
+      if (el.scrollHeight > el.clientHeight + 2) return el; // 2px tolerance
+    }
+    el = el.parentElement;
+  }
+  return null;
+}
+
+function canSwipeVertical(direction, touchTarget) {
+  // direction: 'up' (next card) or 'down' (prev card)
+  var scrollEl = getScrollableParent(touchTarget);
+  if (!scrollEl) return true; // not scrollable → swipe freely
+
+  if (direction === 'up') {
+    // Swipe up = go to next card: only if scrolled to bottom
+    return scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 5;
+  } else {
+    // Swipe down = go to prev card: only if scrolled to top
+    return scrollEl.scrollTop <= 5;
+  }
+}
+
 // ── Swipe / Drag ──
-var txS=0, tyS=0, drag=false;
+var txS=0, tyS=0, drag=false, touchTarget=null;
 var SWIPE_THRESHOLD = 40;
 var vp = document.getElementById('cardViewport');
 
 vp.addEventListener('touchstart', function(e) {
   txS = e.touches[0].clientX;
   tyS = e.touches[0].clientY;
+  touchTarget = e.target;
 }, {passive:true});
 
 vp.addEventListener('touchend', function(e) {
@@ -568,22 +596,28 @@ vp.addEventListener('touchend', function(e) {
   var absDx = Math.abs(dx), absDy = Math.abs(dy);
 
   if (absDy > absDx && absDy > SWIPE_THRESHOLD) {
-    // Vertical dominant → card navigation (up = next, down = prev)
-    goToCard(dy < 0 ? currentIdx + 1 : currentIdx - 1);
+    // Vertical dominant → card navigation, but check scroll boundary first
+    var direction = dy < 0 ? 'up' : 'down';
+    if (canSwipeVertical(direction, touchTarget)) {
+      goToCard(dy < 0 ? currentIdx + 1 : currentIdx - 1);
+    }
   } else if (absDx > absDy && absDx > SWIPE_THRESHOLD) {
-    // Horizontal dominant → slot navigation (left = next slot, right = prev slot)
+    // Horizontal dominant → slot navigation (always allowed)
     goToSlot(dx < 0 ? currentSlotIdx + 1 : currentSlotIdx - 1);
   }
 }, {passive:true});
 
 // Mouse drag (desktop)
-vp.addEventListener('mousedown', function(e) { txS=e.clientX; tyS=e.clientY; drag=true; e.preventDefault(); });
+vp.addEventListener('mousedown', function(e) { txS=e.clientX; tyS=e.clientY; drag=true; touchTarget=e.target; e.preventDefault(); });
 window.addEventListener('mouseup', function(e) {
   if (!drag) return; drag=false;
   var dx = e.clientX - txS, dy = e.clientY - tyS;
   var absDx = Math.abs(dx), absDy = Math.abs(dy);
   if (absDy > absDx && absDy > SWIPE_THRESHOLD) {
-    goToCard(dy < 0 ? currentIdx + 1 : currentIdx - 1);
+    var dir = dy < 0 ? 'up' : 'down';
+    if (canSwipeVertical(dir, touchTarget)) {
+      goToCard(dy < 0 ? currentIdx + 1 : currentIdx - 1);
+    }
   } else if (absDx > absDy && absDx > SWIPE_THRESHOLD) {
     goToSlot(dx < 0 ? currentSlotIdx + 1 : currentSlotIdx - 1);
   }
