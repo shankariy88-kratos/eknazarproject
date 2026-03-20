@@ -316,9 +316,8 @@ function buildStoryCard(s) {
 
 // ── Build empty state for a slot ──
 function buildEmptyState(slot) {
-  var times = { 'सुबह': 'सुबह 7:00 बजे मिलेंगी आज की', 'दोपहर': 'दोपहर 2:00 बजे मिलेंगी आज की', 'शाम': 'शाम 7:00 बजे मिलेंगी आज की' };
-  var names = { 'सुबह': 'सुबह की खबरें आ रही हैं', 'दोपहर': 'दोपहर की खबरें आ रही हैं', 'शाम': 'शाम की खबरें आ रही हैं' };
-  return '<div class="state-screen"><div class="state-icon">' + EMPTY_STATE_ICONS[slot] + '</div><div class="state-title">' + names[slot] + '</div><div class="state-sub">' + times[slot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
+  var titles = { 'सुबह': 'सुबह की एक नज़र 7:00 AM पर अपलोड होगी', 'दोपहर': 'दोपहर की एक नज़र 2:00 PM पर अपलोड होगी', 'शाम': 'शाम की एक नज़र 7:00 PM पर अपलोड होगी' };
+  return '<div class="state-screen"><div class="state-icon">' + EMPTY_STATE_ICONS[slot] + '</div><div class="state-title">' + titles[slot] + '</div><div class="anim-bar"><div class="anim-fill"></div></div></div>';
 }
 
 // ── Build completion card for a slot ──
