@@ -1274,6 +1274,7 @@
     try {
       const all = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
       let migrated = false;
+      const today = localDateStr();
       all.forEach(b => {
         // Migrate old mediaType/mediaUrl → imageUrl/videoUrl
         (b.stories || []).forEach(s => {
@@ -1283,12 +1284,31 @@
           }
           if (!s.imageUrl) s.imageUrl = '';
           if (!s.videoUrl) s.videoUrl = '';
-          // Strip feedBody from old bundles (bloats localStorage)
-          if (s.feedBody) { delete s.feedBody; migrated = true; }
+          // Strip feedBody from OLD bundles only (today's bundles keep it for editing)
+          if (s.feedBody && b.date !== today) { delete s.feedBody; migrated = true; }
         });
       });
-      if (migrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-      return all;
+
+      // Merge duplicate bundles with same date+slot
+      const merged = [];
+      const seen = {};
+      all.forEach(b => {
+        const key = (b.date || '') + '|' + (b.slot || '');
+        if (seen[key] !== undefined) {
+          // Merge stories into the first bundle with this date+slot
+          const target = merged[seen[key]];
+          (b.stories || []).forEach(s => target.stories.push(s));
+          // Keep the latest savedAt
+          if (b.savedAt > target.savedAt) target.savedAt = b.savedAt;
+          migrated = true;
+        } else {
+          seen[key] = merged.length;
+          merged.push(b);
+        }
+      });
+
+      if (migrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      return merged;
     } catch { return []; }
   }
   function persistBundles(all) { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
