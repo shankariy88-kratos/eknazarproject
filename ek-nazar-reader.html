@@ -157,7 +157,7 @@ body { font-family: 'Noto Sans Devanagari', sans-serif; background: #f5f5f5; hei
   <div class="topbar-center">
     <div class="topbar-title" id="topbarTitle">दोपहर की <span class="brand">एक नजर</span> <span class="date" id="topbarDate"></span></div>
   </div>
-  <button class="back-today" id="backToday" onclick="goBackToToday()">← आज</button>
+  <button class="back-today" id="backToday" onclick="goBackToToday()">आज</button>
   <div class="card-counter" id="cardCounter">—</div>
 </div>
 
@@ -425,14 +425,14 @@ function shareBundle() {
 
 // ── History navigation from habit grid ──
 function openHistoryBundle(dateStr, slot) {
-  viewingDate = dateStr;
+  // If tapping today's dot, treat as today (no history mode)
+  viewingDate = (dateStr === getToday()) ? null : dateStr;
   // Reset positions for fresh view
   slotPositions = { 'सुबह': 0, 'दोपहर': 0, 'शाम': 0 };
   currentSlotIdx = SLOT_ORDER.indexOf(slot);
   if (currentSlotIdx === -1) currentSlotIdx = 0;
   currentSlot = SLOT_ORDER[currentSlotIdx];
   renderAllSlots();
-  // Show back-to-today button
   updateBackButton();
 }
 
