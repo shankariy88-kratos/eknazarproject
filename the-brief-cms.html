@@ -2386,8 +2386,8 @@
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
           articleUrl: a.ARTICLE_URL || '',
-          deepLink: a.ARTICLE_DEEPLINK || ''
-          // feedBody excluded — goes straight to localStorage, would bloat it
+          deepLink: a.ARTICLE_DEEPLINK || '',
+          feedBody: a.BODY || ''
         });
       });
     } else {
@@ -2400,8 +2400,8 @@
           imageUrl: a.IMAGE_URL || '',
           videoUrl: (a.VIDEO_URL && a.VIDEO_URL !== 'null') ? a.VIDEO_URL : '',
           articleUrl: a.ARTICLE_URL || '',
-          deepLink: a.ARTICLE_DEEPLINK || ''
-          // feedBody excluded — goes straight to localStorage, would bloat it
+          deepLink: a.ARTICLE_DEEPLINK || '',
+          feedBody: a.BODY || ''
         });
       }
     }
