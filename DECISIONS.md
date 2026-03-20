@@ -15,8 +15,8 @@ index.html is served on localhost:8080 for development. the-brief-cms.html is th
 ## Why localStorage, not a database
 This is a demo/POC project. localStorage keeps it zero-infrastructure — no backend, no database, no hosting costs. The trade-off is 5MB storage limit and per-domain isolation (localhost bundles ≠ GitHub Pages bundles).
 
-## Why feedBody is NOT stored in localStorage bundles
-Each Metabase article body is 10-50KB of raw HTML. Storing it per story in localStorage would hit the 5MB limit after a few bundles. feedBody is kept in memory only (live `stories` array) for summarization, then stripped on save.
+## Why feedBody handling is date-aware
+Each Metabase article body is 10-50KB of raw HTML. Storing all of them in localStorage would hit the 5MB limit. Solution: today's bundles KEEP feedBody in localStorage so the modal can show article body for editing/summarization. Old bundles (date ≠ today) have feedBody stripped on load. This balances usability (body available during the editing session) with storage limits (auto-cleaned next day).
 
 ## Why dates use localDateStr(), never toISOString()
 `toISOString()` returns UTC date. In IST (UTC+5:30), after 6:30 PM, UTC date is tomorrow. This caused bundles to disappear from the reader after evening. All date comparisons now use `localDateStr()` which returns `YYYY-MM-DD` in local timezone.
@@ -59,7 +59,16 @@ Manual typing and clipboard paste produce inconsistent HTML — foreign fonts, r
 If the CMS tab is kept open past midnight, the date picker still shows yesterday. Bundles saved with the stale date end up under the wrong day. `refreshDateIfStale()` runs on tab switch to editor, and `saveBundle()` warns if the date is in the past.
 
 ## Why loadAllBundles() runs migrations
-Old bundles may have: (1) `mediaUrl`/`mediaType` instead of `imageUrl`/`videoUrl`, (2) wrong `b.date` from stale date picker, (3) leftover `feedBody` bloat. The migration in `loadAllBundles()` fixes all three on every load and persists the fix.
+Old bundles may have: (1) `mediaUrl`/`mediaType` instead of `imageUrl`/`videoUrl`, (2) leftover `feedBody` bloat (old bundles only). Additionally, it auto-merges duplicate bundles with the same date+slot into one.
 
 ## Why callClaude() is a shared helper
 The Anthropic API call pattern (headers, error handling, text extraction) was duplicated 9 times across summarize, extract, regen functions. `callClaude(messages, opts)` centralizes this. All AI calls go through it.
+
+## Why one bundle per date+slot is enforced
+Having two "20 Mar सुबह" bundles is confusing — the editor doesn't know which one to show. `saveBundle()` merges stories into existing same-date+slot bundles. `loadAllBundles()` migration auto-merges any historical duplicates. This ensures the History tab shows exactly one entry per date+slot.
+
+## Why date migration was removed
+The aggressive migration that forced `b.date = savedAt` was causing bundles to move to wrong dates (e.g., a bundle intentionally saved for tomorrow). The stale date picker warning (`refreshDateIfStale()` + confirm dialog on save) is sufficient prevention. The editorial date (`b.date`) should be whatever the editor chose in the date picker.
+
+## Why fixFeedTitle() strips leading colons
+Metabase TITLE column sometimes has the city/topic prefix missing, leaving titles like `: ठेकों की नीलामी...`. `fixFeedTitle()` strips the leading `:` and whitespace. Decision: don't prepend CITY — just clean up the colon. The editor can add location context via the tag system instead.

@@ -1,5 +1,14 @@
 # Ek Nazar — Change Log
 
+## v3.9.9 — 20 March 2026 (Session 2)
+**Fixed:** One bundle per date+slot — saveBundle() merges into existing, loadAllBundles() auto-merges duplicates
+**Fixed:** Removed aggressive date migration that forced b.date = savedAt (stale picker warning is sufficient)
+**Fixed:** Article body (feedBody) now visible in modal when adding from Article Feed to existing bundles
+**Fixed:** feedBody kept for today's bundles in localStorage, stripped only from old bundles (prevents bloat without losing current session data)
+**Fixed:** Feed titles starting with ":" — fixFeedTitle() strips leading colon cleanly
+**Tested:** Bundle save merge, duplicate merge on load, modal body visibility, title cleanup, JS syntax validation
+**Status:** Pushed to GitHub ✅
+
 ## v3.9.8 — 20 March 2026
 **Added:** Card Preview button (📱 Preview) in History bundles — same preview modal as New Bundle
 **Tested:** Preview opens for history bundles, navigation works, slot/tag/image renders correctly

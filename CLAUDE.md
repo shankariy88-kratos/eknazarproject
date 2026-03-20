@@ -13,7 +13,8 @@
 Ek Nazar — Dainik Bhaskar daily news brief
 Repo: github.com/shankariy88-kratos/eknazarproject
 ## Files
-- index.html — Editorial CMS (141KB, v3.9.8) — the source of truth
+- index.html — Editorial CMS (~144KB, v3.9.9) — the source of truth
+- DECISIONS.md — Why decisions were made
 - the-brief-cms.html — exact copy of index.html, served from GitHub Pages
 - ek-nazar-reader.html — Reader app (card swipe UI)
 - ek-nazar-landing.html — Landing page
@@ -31,11 +32,13 @@ Node.js, Claude API (Sonnet), Metabase API, localStorage bundles
 - Bundle dates come from date picker (editorial date), savedAt is actual timestamp
 ## Known Patterns
 - index.html and the-brief-cms.html must always be identical
-- loadAllBundles() runs migrations on load (mediaUrl→imageUrl, date correction, feedBody cleanup)
+- loadAllBundles() runs migrations on load (mediaUrl→imageUrl, feedBody cleanup for old bundles, duplicate date+slot merge)
 - Auto-color headline runs on Extract/tag-change only, NOT on blur (user owns styling after prefill)
+- One bundle per date+slot — saveBundle() merges, loadAllBundles() deduplicates
+- fixFeedTitle() strips leading ":" from Metabase titles
 ## Never do
 - Save to /tmp/
 - Start coding without reading existing files first
 - End session without confirming files are saved
 - Use toISOString() for date comparisons (UTC timezone bug)
-- Store feedBody in localStorage bundles (bloats toward 5MB limit)
+- Store feedBody in localStorage for OLD bundles (bloats toward 5MB limit) — today's bundles keep it
