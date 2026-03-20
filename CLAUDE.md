@@ -16,7 +16,7 @@ Repo: github.com/shankariy88-kratos/eknazarproject
 - index.html — Editorial CMS (~144KB, v3.9.9) — the source of truth
 - DECISIONS.md — Why decisions were made
 - the-brief-cms.html — exact copy of index.html, served from GitHub Pages
-- ek-nazar-reader.html — Reader app (vertical card swipe + horizontal slot swipe, v4.0.0)
+- ek-nazar-reader.html — Reader app (vertical card swipe + horizontal slot swipe, v4.1.0)
 - ek-nazar-landing.html — Landing page
 - CHANGELOG.md — Full version history
 - package.json — Node.js config
@@ -38,6 +38,8 @@ Node.js, Claude API (Sonnet), Metabase API, localStorage bundles
 - Auto-color headline runs on Extract/tag-change only, NOT on blur (user owns styling after prefill)
 - One bundle per date+slot — saveBundle() merges, loadAllBundles() deduplicates
 - fixFeedTitle() strips leading ":" from Metabase titles
+- Reader habit grid is interactive — tapping dots opens historical bundles via `viewingDate` state
+- Use नजर (without nuqta) not नज़र in reader-facing text
 ## Never do
 - Save to /tmp/
 - Start coding without reading existing files first

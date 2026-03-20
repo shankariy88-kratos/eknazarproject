@@ -1,5 +1,15 @@
 # Ek Nazar — Change Log
 
+## v4.1.0 — 20 March 2026 (Session 3 continued)
+**Changed:** Interactive habit grid — tap ✓ or - dots to open historical bundles for re-read/catch-up
+**Added:** `viewingDate` state, `openHistoryBundle()`, `goBackToToday()`, "← आज" pill button
+**Changed:** Topbar shows historical date when viewing past bundles
+**Changed:** Scroll-aware swipe (v4.0.1) — long card content scrolls before card transition
+**Changed:** Simplified empty slot copy — title only, no subtitle (v4.0.2)
+**Changed:** नज़र → नजर (without nuqta) everywhere in reader (v4.0.3)
+**Tested:** Habit dot taps, back-to-today navigation, scroll boundary detection, empty slot display
+**Status:** Pushed to GitHub ✅
+
 ## v4.0.0 — 20 March 2026 (Session 3)
 **Changed:** MAJOR — Reader swipe redesign: swipe UP/DOWN for cards, LEFT/RIGHT for slots
 **Architecture:** Nested DOM: .slot-track (horizontal translateX) > .slot-panel > .card-track (vertical translateY)

@@ -78,3 +78,12 @@ Previously, switching slots called `renderCards()` which destroyed and rebuilt t
 
 ## Why fixFeedTitle() strips leading colons
 Metabase TITLE column sometimes has the city/topic prefix missing, leaving titles like `: ठेकों की नीलामी...`. `fixFeedTitle()` strips the leading `:` and whitespace. Decision: don't prepend CITY — just clean up the colon. The editor can add location context via the tag system instead.
+
+## Why habit grid dots are interactive
+The reading streak grid on the completion card was display-only. Feedback: users should be able to tap ✓ (done) or - (missed) dots to open that day's bundle for re-reading or catch-up. Grey dots (no bundle published) remain disabled. This uses `viewingDate` — when set, `getSlotBundle()` loads from that date instead of today. A "← आज" pill button appears to return to today's view.
+
+## Why scroll boundary check exists for vertical swipe
+Card body has `overflow-y: auto` for long bullet content. Without boundary detection, swiping up on a long card would jump to the next card instead of scrolling content. `canSwipeVertical()` checks: swipe up triggers next card ONLY when scrolled to bottom; swipe down triggers prev card ONLY when scrolled to top. Same for `.comp-scroll` on the completion card.
+
+## Why नजर not नज़र
+Dainik Bhaskar uses नजर (without nukta/nuqta dot under ज) in their branding. All reader-facing text uses नजर for consistency with the publication's style.
